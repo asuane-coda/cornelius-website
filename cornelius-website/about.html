@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — Cornelius Chinazam Okeke</title>
+  <meta name="description" content="The story of Cornelius Chinazam Okeke — HR People & Systems Architect, ACIPM." />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* NAV AVATAR */
+    .nav-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center top;
+      border: 1.5px solid var(--gold-dim);
+      flex-shrink: 0;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 0.6rem; }
+
+    /* ABOUT HERO */
+    .about-hero {
+      padding: 8rem 0 0;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .about-hero-inner {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 4rem;
+      align-items: flex-end;
+    }
+
+    .about-hero-text { padding-bottom: 4rem; }
+
+    .about-headline-sm {
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      color: var(--text-muted);
+      font-style: italic;
+      margin-bottom: 0.5rem;
+    }
+
+    .about-headline-lg {
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      line-height: 1.15;
+    }
+
+    .about-hero-photo-wrap { position: relative; align-self: flex-end; }
+
+    .about-hero-photo {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+      object-position: center top;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      display: block;
+      filter: grayscale(10%);
+    }
+
+    .about-hero-photo-wrap::before {
+      content: '';
+      position: absolute;
+      top: -8px; left: -8px; right: 8px; bottom: 0;
+      border: 1px solid var(--gold-dim);
+      border-bottom: none;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      opacity: 0.45;
+      z-index: -1;
+    }
+
+    @media (max-width: 860px) {
+      .about-hero-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+      .about-hero-photo-wrap { max-width: 320px; }
+      .about-hero-photo { height: 300px; border-radius: var(--radius-lg); }
+      .about-hero-photo-wrap::before { border-radius: var(--radius-lg); border-bottom: 1px solid var(--gold-dim); }
+      .about-hero-text { padding-bottom: 0; }
+      .about-hero { padding-bottom: 3rem; }
+    }
+
+    .about-body {
+      padding: 5rem 0;
+    }
+
+    .about-intro {
+      font-size: 1.2rem;
+      line-height: 1.9;
+      color: var(--text-muted);
+      margin-bottom: 3rem;
+    }
+
+    .about-intro strong { color: var(--text); font-weight: 500; }
+
+    .about-section {
+      margin-bottom: 4rem;
+    }
+
+    .about-section-title {
+      font-size: 1.5rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .about-section p {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.9;
+      margin-bottom: 1rem;
+    }
+
+    .about-section p strong { color: var(--text); font-weight: 500; }
+
+    .pullquote {
+      border-left: 2px solid var(--gold);
+      padding: 1rem 0 1rem 2rem;
+      margin: 2.5rem 0;
+    }
+
+    .pullquote p {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-style: italic;
+      color: var(--text) !important;
+      line-height: 1.6;
+      margin-bottom: 0 !important;
+    }
+
+    .about-sidebar {
+      position: sticky;
+      top: 6rem;
+    }
+
+    .sidebar-tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-stat {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+
+    .sidebar-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .signature-block {
+      border-top: 1px solid var(--border);
+      padding-top: 3rem;
+      margin-top: 1rem;
+    }
+
+    .signature-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .signature-title {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      margin-bottom: 1.5rem;
+    }
+
+    .signature-links {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .signature-links a {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+      transition: opacity 0.2s;
+    }
+
+    .signature-links a:hover { opacity: 0.7; }
+
+    @media (max-width: 900px) {
+      .two-col { grid-template-columns: 1fr; }
+      .about-sidebar { position: static; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <img src="images/cornelius.jpeg" alt="Cornelius Okeke" class="nav-avatar" />
+      Cornelius <span>Okeke</span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="about.html">About</a></li>
+      <li><a href="insights.html">Insights</a></li>
+      <li><a href="work-with-me.html">Work With Me</a></li>
+      <li><a href="contact.html" class="nav-cta">Get In Touch</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="about-hero">
+  <div class="container">
+    <div class="about-hero-inner">
+      <div class="about-hero-text">
+        <p class="section-label">About Cornelius</p>
+        <h1>
+          <div class="about-headline-sm">I Didn't Plan to Be in HR.</div>
+          <div class="about-headline-lg">HR Found Me — and I Haven't Looked Back.</div>
+        </h1>
+      </div>
+      <div class="about-hero-photo-wrap">
+        <img src="images/cornelius.jpeg" alt="Cornelius Chinazam Okeke" class="about-hero-photo" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="about-body">
+  <div class="container">
+    <div class="two-col">
+
+      <div>
+        <p class="about-intro">
+          My name is <strong>Cornelius Chinazam Okeke.</strong> I'm an HR People &amp; Systems Architect, a people strategist, and, if you ask the people I've worked with, the person they called when things got complicated.
+          <br><br>
+          But I didn't start here.
+          <br><br>
+          I studied Geography and Regional Planning at the University of Benin. Not exactly the conventional path into Human Resources. But if you knew me then, you would not be surprised by where I ended up. I was always the one people gravitated toward — the one given leadership roles before I even asked for them. In the Nigerian Fellowship of Catholic Students, I served as Director of the Theatre Group for three consecutive years, writing scripts, directing people, creating something out of nothing. Looking back, I was practising HR long before I had a name for it.
+        </p>
+
+        <div class="about-section">
+          <div class="gold-line"></div>
+          <h2 class="about-section-title">The Accident That Wasn't Really an Accident</h2>
+          <p>During my NYSC, I interviewed and was posted to the HR department of Wazobia FM — Cool FM, Nigeria Info, Arewa — as an intern. I threw myself into the work. Recruitment, onboarding, employee relations, payroll, documentation. I was so invested, so thorough, that people genuinely did not believe I was an intern. When my service year ended, they asked me to stay. I said yes.</p>
+          <p>That was 2016. I have never left HR since.</p>
+
+          <div class="pullquote">
+            <p>"I have always known how to manage and direct people. HR just gave that instinct a structure."</p>
+          </div>
+        </div>
+
+        <div class="about-section">
+          <div class="gold-line"></div>
+          <h2 class="about-section-title">Why I Believe Structure Sets People Free</h2>
+          <p>People think rules restrict them. I have seen what happens without them — confusion, inconsistency, injustice, disarray. Structure is not the enemy of freedom. It is the foundation of it. When people know what to expect, what they are owed, and what is expected of them in return, they thrive.</p>
+          <p>My life's work is building those foundations — for organisations, for professionals, and for the individual sitting on their phone at 11pm, wondering if what their employer is doing to them is even legal.</p>
+        </div>
+
+        <div class="about-section">
+          <div class="gold-line"></div>
+          <h2 class="about-section-title">Why HR Deserves Better</h2>
+          <p>Somewhere along the way, Human Resources got a reputation problem. It became the department people called only when something went wrong. The function that existed to enforce rules rather than enable people. The profession that sat at the edge of the boardroom table rather than at it.</p>
+          <p>I have seen what HR looks like when it is done well, and the difference it makes to individuals, to teams, and to entire organisations. I have also seen what happens when it is treated as an afterthought. The gap between those two realities is what drives me.</p>
+          <p>HR is not an administrative function. It is a strategic one. And the people, policies, and systems behind it deserve to be designed with intention, powered by technology, and accessible to everyone — not just large corporations with big budgets.</p>
+          <p><strong>That is the problem I have chosen to solve.</strong></p>
+        </div>
+
+        <div class="about-section">
+          <div class="gold-line"></div>
+          <h2 class="about-section-title">Beyond the Work</h2>
+          <p>I am a director, a writer, a problem-solver. I believe that human interaction needs a guide — someone who helps people navigate the complexity of working with, for, and alongside other people. If you have a problem at work, if you need to find a job but don't know where to start, if you're an employer trying to do right by your team, I want my name to be the one that comes to mind.</p>
+          <p><strong>Because I can help you navigate.</strong></p>
+        </div>
+
+        <div class="signature-block">
+          <div class="signature-name">Cornelius Chinazam Okeke <span style="color:var(--gold);">— ACIPM</span></div>
+          <div class="signature-title">HR Systems Architect &nbsp;│&nbsp; Lagos, Nigeria</div>
+          <div class="signature-links">
+            <a href="https://linkedin.com/in/cornelius-okeke-639422105" target="_blank" rel="noopener">Connect on LinkedIn &rarr;</a>
+            <a href="insights.html">Read My Latest Insights &rarr;</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIDEBAR -->
+      <aside class="about-sidebar">
+        <div style="background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:2rem;">
+          <p class="sidebar-tag">Experience</p>
+          <div class="sidebar-stat">10+</div>
+          <div class="sidebar-label">Years in HR Leadership</div>
+
+          <p class="sidebar-tag">Scale</p>
+          <div class="sidebar-stat">6</div>
+          <div class="sidebar-label">Subsidiaries Managed</div>
+
+          <p class="sidebar-tag">Certification</p>
+          <div class="sidebar-stat">ACIPM</div>
+          <div class="sidebar-label">CIPM Certified Professional</div>
+
+          <hr style="border:none; border-top:1px solid var(--border); margin:1.5rem 0;" />
+
+          <p style="font-size:0.82rem; color:var(--text-muted); line-height:1.7; margin-bottom:1.25rem;">Based in Lagos, Nigeria. Available for remote and in-person engagements globally.</p>
+
+          <a href="work-with-me.html" class="btn btn-secondary" style="width:100%; text-align:center; display:block;">Work With Me</a>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">Cornelius <span>Okeke</span> &mdash; ACIPM</div>
+      <ul class="footer-links">
+        <li><a href="about.html">About</a></li>
+        <li><a href="insights.html">Insights</a></li>
+        <li><a href="work-with-me.html">Work With Me</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <p class="footer-copy">&copy; 2026 Cornelius Chinazam Okeke</p>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

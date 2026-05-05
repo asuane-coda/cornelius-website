@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Blog Management</title>
+  <!-- Prevent search engines from indexing this page -->
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { min-height: 100vh; }
+
+    /* ── LOCK SCREEN ── */
+    .lock-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .lock-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 400px;
+      padding: 2.75rem;
+      text-align: center;
+    }
+
+    .lock-icon {
+      width: 52px; height: 52px;
+      background: rgba(200,169,110,0.1);
+      border: 1px solid var(--gold-dim);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      margin: 0 auto 1.5rem;
+    }
+
+    .lock-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .lock-sub {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .lock-error {
+      display: none;
+      background: rgba(200,90,90,0.1);
+      border: 1px solid rgba(200,90,90,0.3);
+      border-radius: var(--radius);
+      padding: 0.65rem 1rem;
+      font-size: 0.82rem;
+      color: #e07070;
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+
+    /* ── ADMIN SHELL (hidden until unlocked) ── */
+    .admin-shell {
+      display: none;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+    }
+
+    .admin-shell.visible { display: block; }
+
+    /* TOP BAR */
+    .admin-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .admin-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+    }
+
+    .admin-brand span { color: var(--gold); }
+
+    .topbar-actions { display: flex; gap: 0.75rem; align-items: center; }
+
+    .admin-lock-btn {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 0.45rem 1rem;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .admin-lock-btn:hover { color: #e07070; border-color: #c85a5a; }
+
+    /* TABS */
+    .admin-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0;
+    }
+
+    .admin-tab {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.65rem 1.5rem;
+      border: none;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      margin-bottom: -1px;
+    }
+
+    .admin-tab:hover { color: var(--text); }
+    .admin-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+    /* POST LIST */
+    .post-list-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.25rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .post-list-info { flex: 1; min-width: 0; }
+
+    .post-list-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      margin-bottom: 0.3rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .post-list-meta { font-size: 0.78rem; color: var(--text-dim); }
+
+    .post-list-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .badge-published {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 0.2rem 0.65rem;
+      border-radius: 40px;
+      background: rgba(200,169,110,0.15); color: var(--gold);
+      border: 1px solid var(--gold-dim); white-space: nowrap;
+    }
+
+    .badge-draft {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 0.2rem 0.65rem;
+      border-radius: 40px;
+      background: rgba(138,134,128,0.1); color: var(--text-dim);
+      border: 1px solid var(--border-light);
+    }
+
+    .act-btn {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.85rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-light);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .act-btn:hover { color: var(--text); border-color: var(--text); }
+
+    .act-btn.publish  { color: var(--gold); border-color: var(--gold-dim); }
+    .act-btn.publish:hover { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+
+    .act-btn.delete { color: #c85a5a; border-color: #6b2020; }
+    .act-btn.delete:hover { background: #c85a5a; color: #fff; border-color: #c85a5a; }
+
+    /* EDITOR */
+    .editor-wrap { max-width: 720px; }
+
+    .editor-title-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--text);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.75rem;
+      padding: 0.5rem 0 0.75rem;
+      margin-bottom: 1.5rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .editor-title-input::placeholder { color: var(--text-dim); }
+    .editor-title-input:focus { border-bottom-color: var(--gold-dim); }
+
+    .editor-meta-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .editor-meta-row .form-group { flex: 1; min-width: 180px; margin-bottom: 0; }
+
+    .char-count { font-size: 0.75rem; color: var(--text-dim); text-align: right; margin-top: 0.3rem; }
+
+    .editor-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .publish-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      margin-left: auto;
+    }
+
+    .publish-toggle input { width: auto; accent-color: var(--gold); cursor: pointer; }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-dim);
+    }
+
+    .empty-state p { font-size: 0.9rem; margin-top: 0.5rem; }
+
+    /* STATS BAR */
+    .stats-bar {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-item { display: flex; flex-direction: column; gap: 0.2rem; }
+
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.75rem;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .stat-label { font-size: 0.75rem; color: var(--text-muted); }
+
+    @media (max-width: 640px) {
+      .post-list-item { flex-direction: column; }
+      .post-list-actions { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── LOCK SCREEN ───────────────────────────────────────────────────── -->
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-box">
+    <div class="lock-icon">&#128274;</div>
+    <h1 class="lock-title">Blog Admin</h1>
+    <p class="lock-sub">Enter your admin password to manage blog posts.</p>
+    <div class="lock-error" id="lockError">Incorrect password. Please try again.</div>
+    <div class="form-group" style="text-align:left;">
+      <label for="adminPassword">Password</label>
+      <input type="password" id="adminPassword" placeholder="Enter admin password" autocomplete="current-password" />
+    </div>
+    <button class="btn btn-primary" id="unlockBtn" style="width:100%; margin-top:0.75rem;">Unlock</button>
+  </div>
+</div>
+
+<!-- ── ADMIN SHELL ───────────────────────────────────────────────────── -->
+<div class="admin-shell" id="adminShell">
+
+  <div class="admin-topbar">
+    <div class="admin-brand">Cornelius <span>Okeke</span> &mdash; Blog Admin</div>
+    <div class="topbar-actions">
+      <a href="insights.html" target="_blank" class="btn btn-secondary" style="font-size:0.78rem; padding:0.45rem 1rem;">View Live Site &rarr;</a>
+      <button class="admin-lock-btn" id="lockBtn">&#128274; Lock</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-bar" id="statsBar"></div>
+
+  <!-- TABS -->
+  <div class="admin-tabs">
+    <button class="admin-tab active" data-tab="posts">All Posts</button>
+    <button class="admin-tab" data-tab="new">New Post</button>
+  </div>
+
+  <!-- POSTS TAB -->
+  <div id="tabPosts">
+    <div id="postListWrap">
+      <p style="color:var(--text-dim); font-size:0.9rem;">Loading posts&hellip;</p>
+    </div>
+  </div>
+
+  <!-- NEW / EDIT TAB -->
+  <div id="tabNew" style="display:none;">
+    <div class="editor-wrap">
+      <input type="hidden" id="editId" />
+
+      <input
+        type="text"
+        id="postTitle"
+        class="editor-title-input"
+        placeholder="Post title…"
+      />
+
+      <div class="editor-meta-row">
+        <div class="form-group">
+          <label for="postCategory">Category</label>
+          <select id="postCategory">
+            <option value="For Employees">For Employees</option>
+            <option value="For Job Seekers">For Job Seekers</option>
+            <option value="For Employers">For Employers</option>
+            <option value="For HR Professionals">For HR Professionals</option>
+            <option value="AI & The Future of Work">AI &amp; The Future of Work</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="postExcerpt">Excerpt <span style="color:var(--text-dim); font-weight:400;">(shown on the card — keep it short)</span></label>
+        <textarea id="postExcerpt" placeholder="A 1–2 sentence summary of this post…" style="min-height:80px;"></textarea>
+        <p class="char-count" id="excerptCount">0 / 200</p>
+      </div>
+
+      <div class="form-group">
+        <label for="postContent">Full Post Content</label>
+        <textarea id="postContent" placeholder="Write the full article here…" style="min-height:320px;"></textarea>
+      </div>
+
+      <div class="editor-actions">
+        <button class="btn btn-primary" id="saveBtn">Save Post</button>
+        <button class="btn btn-secondary" id="cancelEditBtn" style="display:none;">Cancel Edit</button>
+        <label class="publish-toggle">
+          <input type="checkbox" id="postPublished" />
+          Publish immediately
+        </label>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/supabase-config.js"></script>
+<script src="js/main.js"></script>
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// IMPORTANT: Change this password before deploying the site.
+// Keep it something only Cornelius knows.
+// ─────────────────────────────────────────────────────────────────────────────
+const ADMIN_PASSWORD = 'Cornelius@HR2026';
+
+// ── LOCK / UNLOCK ─────────────────────────────────────────────────────────
+const SESSION_KEY = 'c_admin_auth';
+
+function isUnlocked() {
+  return sessionStorage.getItem(SESSION_KEY) === 'true';
+}
+
+function showAdmin() {
+  document.getElementById('lockScreen').style.display = 'none';
+  document.getElementById('adminShell').classList.add('visible');
+  loadPosts();
+}
+
+function lock() {
+  sessionStorage.removeItem(SESSION_KEY);
+  document.getElementById('adminShell').classList.remove('visible');
+  document.getElementById('adminPassword').value = '';
+  document.getElementById('lockScreen').style.display = 'flex';
+}
+
+// Auto-unlock if session is still active (page refresh)
+if (isUnlocked()) showAdmin();
+
+document.getElementById('unlockBtn').addEventListener('click', tryUnlock);
+document.getElementById('adminPassword').addEventListener('keydown', e => {
+  if (e.key === 'Enter') tryUnlock();
+});
+
+function tryUnlock() {
+  const val = document.getElementById('adminPassword').value;
+  const err = document.getElementById('lockError');
+  if (val === ADMIN_PASSWORD) {
+    sessionStorage.setItem(SESSION_KEY, 'true');
+    err.style.display = 'none';
+    showAdmin();
+  } else {
+    err.style.display = 'block';
+    document.getElementById('adminPassword').value = '';
+    document.getElementById('adminPassword').focus();
+  }
+}
+
+document.getElementById('lockBtn').addEventListener('click', lock);
+
+// ── TABS ─────────────────────────────────────────────────────────────────
+document.querySelectorAll('.admin-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const t = tab.dataset.tab;
+    document.getElementById('tabPosts').style.display = t === 'posts' ? 'block' : 'none';
+    document.getElementById('tabNew').style.display   = t === 'new'   ? 'block' : 'none';
+    if (t === 'posts') loadPosts();
+  });
+});
+
+function switchToTab(name) {
+  document.querySelectorAll('.admin-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === name);
+  });
+  document.getElementById('tabPosts').style.display = name === 'posts' ? 'block' : 'none';
+  document.getElementById('tabNew').style.display   = name === 'new'   ? 'block' : 'none';
+}
+
+// ── LOAD ALL POSTS ─────────────────────────────────────────────────────
+async function loadPosts() {
+  const wrap = document.getElementById('postListWrap');
+  wrap.innerHTML = '<p style="color:var(--text-dim);font-size:0.9rem;">Loading&hellip;</p>';
+
+  try {
+    const posts = await window.getAllPosts();
+
+    // Stats
+    const total     = posts.length;
+    const published = posts.filter(p => p.published).length;
+    const drafts    = total - published;
+
+    document.getElementById('statsBar').innerHTML = `
+      <div class="stat-item"><span class="stat-num">${total}</span><span class="stat-label">Total posts</span></div>
+      <div class="stat-item"><span class="stat-num">${published}</span><span class="stat-label">Published</span></div>
+      <div class="stat-item"><span class="stat-num">${drafts}</span><span class="stat-label">Drafts</span></div>
+    `;
+
+    if (!posts.length) {
+      wrap.innerHTML = `
+        <div class="empty-state">
+          <div style="font-size:2rem; margin-bottom:0.75rem;">&#9998;</div>
+          <strong>No posts yet</strong>
+          <p>Click <strong>New Post</strong> to write your first insight.</p>
+        </div>`;
+      return;
+    }
+
+    wrap.innerHTML = posts.map(p => `
+      <div class="post-list-item">
+        <div class="post-list-info">
+          <div class="post-list-title">${escapeHtml(p.title)}</div>
+          <div class="post-list-meta">
+            <span>${escapeHtml(p.category)}</span>
+            &nbsp;&middot;&nbsp;
+            <span>${formatDate(p.created_at)}</span>
+          </div>
+        </div>
+        <div class="post-list-actions">
+          <span class="${p.published ? 'badge-published' : 'badge-draft'}">${p.published ? 'Published' : 'Draft'}</span>
+          <button class="act-btn publish" data-id="${p.id}" data-pub="${p.published}">
+            ${p.published ? 'Unpublish' : 'Publish'}
+          </button>
+          <button class="act-btn" data-edit="${p.id}">Edit</button>
+          <button class="act-btn delete" data-del="${p.id}">Delete</button>
+        </div>
+      </div>
+    `).join('');
+
+    // Publish / Unpublish
+    wrap.querySelectorAll('[data-pub]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id  = +btn.dataset.id;
+        const pub = btn.dataset.pub === 'true';
+        btn.textContent = 'Saving…';
+        btn.disabled = true;
+        await window.updatePost(id, { published: !pub });
+        showToast(pub ? 'Post unpublished.' : 'Post published!', 'success');
+        loadPosts();
+      });
+    });
+
+    // Edit
+    wrap.querySelectorAll('[data-edit]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const post = await window.getPostById(+btn.dataset.edit);
+        if (!post) return;
+        document.getElementById('editId').value         = post.id;
+        document.getElementById('postTitle').value      = post.title    || '';
+        document.getElementById('postExcerpt').value    = post.excerpt  || '';
+        document.getElementById('postContent').value    = post.content  || '';
+        document.getElementById('postCategory').value   = post.category || 'For Employees';
+        document.getElementById('postPublished').checked = !!post.published;
+        document.getElementById('cancelEditBtn').style.display = 'inline-block';
+        document.querySelector('[data-tab="new"]').textContent = 'Edit Post';
+        updateExcerptCount();
+        switchToTab('new');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    // Delete
+    wrap.querySelectorAll('[data-del]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Delete this post permanently? This cannot be undone.')) return;
+        await window.deletePost(+btn.dataset.del);
+        showToast('Post deleted.', 'success');
+        loadPosts();
+      });
+    });
+
+  } catch (e) {
+    wrap.innerHTML = '<p style="color:#c85a5a;font-size:0.9rem;">Could not load posts. Check your Supabase credentials in supabase-config.js.</p>';
+  }
+}
+
+// ── SAVE POST ─────────────────────────────────────────────────────────
+document.getElementById('saveBtn').addEventListener('click', async () => {
+  const id        = document.getElementById('editId').value;
+  const title     = document.getElementById('postTitle').value.trim();
+  const excerpt   = document.getElementById('postExcerpt').value.trim();
+  const content   = document.getElementById('postContent').value.trim();
+  const category  = document.getElementById('postCategory').value;
+  const published = document.getElementById('postPublished').checked;
+
+  if (!title)   { showToast('Please add a title.', 'error');   return; }
+  if (!excerpt) { showToast('Please add an excerpt.', 'error'); return; }
+  if (!content) { showToast('Please add the post content.', 'error'); return; }
+
+  const btn = document.getElementById('saveBtn');
+  btn.textContent = 'Saving…';
+  btn.disabled = true;
+
+  try {
+    if (id) {
+      await window.updatePost(+id, { title, excerpt, content, category, published });
+      showToast('Post updated successfully!', 'success');
+    } else {
+      await window.createPost({ title, excerpt, content, category, published });
+      showToast('Post created successfully!', 'success');
+    }
+    resetEditor();
+    switchToTab('posts');
+    loadPosts();
+  } catch (err) {
+    showToast('Save failed. Check your Supabase credentials.', 'error');
+  } finally {
+    btn.textContent = 'Save Post';
+    btn.disabled = false;
+  }
+});
+
+document.getElementById('cancelEditBtn').addEventListener('click', () => {
+  resetEditor();
+  switchToTab('posts');
+});
+
+function resetEditor() {
+  document.getElementById('editId').value         = '';
+  document.getElementById('postTitle').value      = '';
+  document.getElementById('postExcerpt').value    = '';
+  document.getElementById('postContent').value    = '';
+  document.getElementById('postCategory').value   = 'For Employees';
+  document.getElementById('postPublished').checked = false;
+  document.getElementById('cancelEditBtn').style.display = 'none';
+  document.querySelector('[data-tab="new"]').textContent = 'New Post';
+  updateExcerptCount();
+}
+
+function updateExcerptCount() {
+  const len = document.getElementById('postExcerpt').value.length;
+  document.getElementById('excerptCount').textContent = `${len} / 200`;
+}
+
+document.getElementById('postExcerpt').addEventListener('input', updateExcerptCount);
+</script>
+</body>
+</html>

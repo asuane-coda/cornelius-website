@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Work With Me — Cornelius Chinazam Okeke</title>
+  <meta name="description" content="Brand partnerships, HR consulting, speaking, and career coaching with Cornelius Chinazam Okeke — ACIPM." />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .offerings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3.5rem;
+    }
+
+    .offering-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2.25rem 2rem;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+
+    .offering-card:hover {
+      border-color: var(--gold-dim);
+      transform: translateY(-4px);
+    }
+
+    .offering-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      color: var(--border-light);
+      line-height: 1;
+      margin-bottom: 1rem;
+      transition: color 0.25s;
+    }
+
+    .offering-card:hover .offering-number { color: var(--gold-dim); }
+
+    .offering-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .offering-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      line-height: 1.3;
+      margin-bottom: 1rem;
+    }
+
+    .offering-body {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    .cta-band {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 4rem 3rem;
+      text-align: center;
+      margin-top: 4rem;
+    }
+
+    .cta-band h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      margin-bottom: 1rem;
+    }
+
+    .cta-band p {
+      font-size: 1rem;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin: 0 auto 2rem;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 768px) {
+      .cta-band { padding: 2.5rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <img src="images/cornelius.jpeg" alt="Cornelius Okeke" class="nav-avatar" />
+      Cornelius <span>Okeke</span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="about.html">About</a></li>
+      <li><a href="insights.html">Insights</a></li>
+      <li><a href="work-with-me.html">Work With Me</a></li>
+      <li><a href="contact.html" class="nav-cta">Get In Touch</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="container">
+    <p class="page-hero-label">Work With Me</p>
+    <h1 class="page-hero-title">Let's Build Something<br>That Works.</h1>
+    <p class="page-hero-sub">Whether you're a brand looking for a credible HR voice, an organisation that needs expert HR support, or a professional who wants guidance — here's how we can work together.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <p class="section-label">Offerings</p>
+    <div class="offerings-grid">
+
+      <div class="offering-card">
+        <div class="offering-number">01</div>
+        <p class="offering-label">Brand Partnerships</p>
+        <h3 class="offering-title">Brand Partnerships &amp; Sponsorships</h3>
+        <p class="offering-body">I create content that reaches employees, employers, and job seekers across Nigeria. If your brand serves the working population — pensions, health insurance, banking, fintech, learning — let's talk about how we can create value together.</p>
+      </div>
+
+      <div class="offering-card">
+        <div class="offering-number">02</div>
+        <p class="offering-label">Organisations</p>
+        <h3 class="offering-title">HR Consulting for Organisations</h3>
+        <p class="offering-body">Need help building or restructuring your HR function? Policy design, HRIS implementation, performance frameworks, compliance audits — I bring board-level HR thinking to organisations of all sizes.</p>
+      </div>
+
+      <div class="offering-card">
+        <div class="offering-number">03</div>
+        <p class="offering-label">Speaking</p>
+        <h3 class="offering-title">Speaking &amp; Training</h3>
+        <p class="offering-body">I speak on HR strategy, the future of work, AI in HR, and employee rights. Available for conferences, corporate training sessions, university career events, and panel discussions.</p>
+      </div>
+
+      <div class="offering-card">
+        <div class="offering-number">04</div>
+        <p class="offering-label">Coaching</p>
+        <h3 class="offering-title">Career Coaching for HR Professionals</h3>
+        <p class="offering-body">If you're an HR practitioner trying to grow your career, build your profile, or transition into a more strategic role — I can guide you.</p>
+      </div>
+
+    </div>
+
+    <div class="cta-band">
+      <p class="section-label" style="text-align:center; margin-bottom:0.75rem;">Start Here</p>
+      <h2>Ready to Start a Conversation?</h2>
+      <p>Send me a message and I'll respond within 48 hours. Let's explore what's possible.</p>
+      <a href="contact.html" class="btn btn-primary">Get In Touch &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">Cornelius <span>Okeke</span> &mdash; ACIPM</div>
+      <ul class="footer-links">
+        <li><a href="about.html">About</a></li>
+        <li><a href="insights.html">Insights</a></li>
+        <li><a href="work-with-me.html">Work With Me</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <p class="footer-copy">&copy; 2026 Cornelius Chinazam Okeke</p>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — Cornelius Chinazam Okeke</title>
+  <meta name="description" content="Get in touch with Cornelius Chinazam Okeke — HR People & Systems Architect, ACIPM." />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 5rem;
+      align-items: start;
+      padding: 5rem 0;
+    }
+
+    .contact-info-block {
+      margin-bottom: 2.5rem;
+    }
+
+    .contact-info-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 0.4rem;
+    }
+
+    .contact-info-value {
+      font-size: 1rem;
+      color: var(--text);
+    }
+
+    .contact-info-value a {
+      color: var(--gold);
+      transition: opacity 0.2s;
+    }
+
+    .contact-info-value a:hover { opacity: 0.75; }
+
+    .contact-form-wrap {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      position: sticky;
+      top: 6rem;
+    }
+
+    .contact-form-title {
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .contact-form-sub {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+
+    .response-promise {
+      margin-top: 1.25rem;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .response-promise::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold-dim);
+      flex-shrink: 0;
+    }
+
+    .contact-socials {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .social-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border: 1px solid var(--border-light);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius);
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .social-link:hover { color: var(--gold); border-color: var(--gold-dim); }
+
+    @media (max-width: 960px) {
+      .contact-layout { grid-template-columns: 1fr; gap: 3rem; }
+      .contact-form-wrap { position: static; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <img src="images/cornelius.jpeg" alt="Cornelius Okeke" class="nav-avatar" />
+      Cornelius <span>Okeke</span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="about.html">About</a></li>
+      <li><a href="insights.html">Insights</a></li>
+      <li><a href="work-with-me.html">Work With Me</a></li>
+      <li><a href="contact.html" class="nav-cta">Get In Touch</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="container">
+    <p class="page-hero-label">Contact</p>
+    <h1 class="page-hero-title">Let's Talk.</h1>
+    <p class="page-hero-sub">Have a question? A partnership idea? An HR challenge you'd like to talk through? I'm here.</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="contact-layout">
+
+    <!-- INFO COLUMN -->
+    <div>
+      <div class="gold-line"></div>
+      <p class="section-body" style="margin-bottom:3rem;">Fill in the form or reach me directly through any of the channels below. I typically respond within 48 hours.</p>
+
+      <div class="contact-info-block">
+        <p class="contact-info-label">Email</p>
+        <p class="contact-info-value"><a href="mailto:corneliusokekehr@gmail.com">corneliusokekehr@gmail.com</a></p>
+      </div>
+
+      <div class="contact-info-block">
+        <p class="contact-info-label">LinkedIn</p>
+        <p class="contact-info-value"><a href="https://linkedin.com/in/cornelius-okeke-639422105" target="_blank" rel="noopener">linkedin.com/in/cornelius-okeke-639422105</a></p>
+      </div>
+
+      <div class="contact-info-block">
+        <p class="contact-info-label">Location</p>
+        <p class="contact-info-value">Based in Lagos, Nigeria.<br><span style="color:var(--text-muted); font-size:0.9rem;">Available for remote and in-person engagements.</span></p>
+      </div>
+
+      <div class="contact-socials">
+        <a href="https://linkedin.com/in/cornelius-okeke-639422105" target="_blank" rel="noopener" class="social-link">LinkedIn</a>
+        <a href="mailto:corneliusokekehr@gmail.com" class="social-link">Email</a>
+      </div>
+    </div>
+
+    <!-- FORM COLUMN -->
+    <div class="contact-form-wrap">
+      <h2 class="contact-form-title">Send a Message</h2>
+      <p class="contact-form-sub">All fields are required. I'll get back to you within 48 hours.</p>
+
+      <form id="contactForm" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contactName">Name</label>
+            <input type="text" id="contactName" name="from_name" placeholder="Your name" required />
+          </div>
+          <div class="form-group">
+            <label for="contactEmail">Email</label>
+            <input type="email" id="contactEmail" name="from_email" placeholder="your@email.com" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="contactSubject">Subject</label>
+          <select id="contactSubject" name="subject" required>
+            <option value="" disabled selected>Select a subject…</option>
+            <option value="General Enquiry">General Enquiry</option>
+            <option value="Partnership">Partnership</option>
+            <option value="Consulting">Consulting</option>
+            <option value="Speaking">Speaking</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="contactMessage">Message</label>
+          <textarea id="contactMessage" name="message" placeholder="Tell me a bit about what you have in mind…" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="sendBtn" style="width:100%;">Send Message</button>
+        <p class="response-promise">I typically respond within 48 hours.</p>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">Cornelius <span>Okeke</span> &mdash; ACIPM</div>
+      <ul class="footer-links">
+        <li><a href="about.html">About</a></li>
+        <li><a href="insights.html">Insights</a></li>
+        <li><a href="work-with-me.html">Work With Me</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <p class="footer-copy">&copy; 2026 Cornelius Chinazam Okeke</p>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  emailjs.init('YOUR_EMAILJS_PUBLIC_KEY'); // TODO: replace with your public key
+</script>
+<script src="js/main.js"></script>
+<script>
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const name    = document.getElementById('contactName').value.trim();
+  const email   = document.getElementById('contactEmail').value.trim();
+  const subject = document.getElementById('contactSubject').value;
+  const message = document.getElementById('contactMessage').value.trim();
+
+  if (!name || !email || !subject || !message) {
+    showToast('Please fill in all fields.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('sendBtn');
+  btn.textContent = 'Sending…';
+  btn.disabled = true;
+
+  try {
+    await emailjs.send(
+      'YOUR_SERVICE_ID',          // TODO: replace with your EmailJS service ID
+      'YOUR_CONTACT_TEMPLATE_ID', // TODO: replace with your EmailJS template ID
+      {
+        from_name:  name,
+        from_email: email,
+        subject:    subject,
+        message:    message,
+        to_email:   'corneliusokekehr@gmail.com'
+      }
+    );
+
+    showToast('Message sent! I\'ll be in touch within 48 hours.', 'success');
+    this.reset();
+  } catch (err) {
+    showToast('Something went wrong. Please try again or email directly.', 'error');
+    console.error('EmailJS error:', err);
+  } finally {
+    btn.textContent = 'Send Message';
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

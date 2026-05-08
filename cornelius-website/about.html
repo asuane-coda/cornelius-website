@@ -7,36 +7,68 @@
   <meta name="description" content="The story of Cornelius Chinazam Okeke — HR People & Systems Architect, ACIPM." />
   <link rel="stylesheet" href="css/style.css" />
   <style>
-    /* NAV AVATAR */
+    /* ── NAV AVATAR FIX ── */
+    .nav-logo { display: flex !important; align-items: center !important; gap: 0.65rem !important; }
     .nav-avatar {
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      object-fit: cover;
-      object-position: center top;
-      border: 1.5px solid var(--gold-dim);
-      flex-shrink: 0;
+      width: 36px !important; height: 36px !important;
+      border-radius: 50% !important;
+      object-fit: cover !important; object-position: center top !important;
+      border: 2px solid var(--accent) !important;
+      flex-shrink: 0 !important; display: inline-block !important;
     }
-    .nav-logo { display: flex; align-items: center; gap: 0.6rem; }
 
-    /* ABOUT HERO */
+    /* ── ABOUT HERO ── */
     .about-hero {
-      padding: 8rem 0 0;
-      border-bottom: 1px solid var(--border);
+      background: #0d1b2e;
+      padding: 0;
+      border-bottom: none;
+      display: grid;
+      grid-template-columns: 1fr 480px;
+      min-height: 420px;
       overflow: hidden;
     }
 
-    .about-hero-inner {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 4rem;
-      align-items: flex-end;
+    .about-hero-text {
+      padding: 10rem 3rem 5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      max-width: 660px;
+      width: 100%;
+      margin-left: auto;
     }
 
-    .about-hero-text { padding-bottom: 4rem; }
+    .about-hero-image {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-hero-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      filter: brightness(0.75) saturate(0.85);
+    }
+
+    .about-hero-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, #0d1b2e 0%, transparent 40%);
+    }
+
+    @media (max-width: 900px) {
+      .about-hero { grid-template-columns: 1fr; }
+      .about-hero-text { padding: 8rem 2rem 3rem; }
+      .about-hero-image { height: 260px; }
+      .about-hero-image::after { background: linear-gradient(to bottom, #0d1b2e 0%, transparent 40%); }
+    }
 
     .about-headline-sm {
       font-size: clamp(1.4rem, 2.5vw, 2rem);
-      color: var(--text-muted);
+      color: #94afc8;
       font-style: italic;
       margin-bottom: 0.5rem;
     }
@@ -44,38 +76,7 @@
     .about-headline-lg {
       font-size: clamp(2rem, 4vw, 3.25rem);
       line-height: 1.15;
-    }
-
-    .about-hero-photo-wrap { position: relative; align-self: flex-end; }
-
-    .about-hero-photo {
-      width: 100%;
-      height: 400px;
-      object-fit: cover;
-      object-position: center top;
-      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-      display: block;
-      filter: grayscale(10%);
-    }
-
-    .about-hero-photo-wrap::before {
-      content: '';
-      position: absolute;
-      top: -8px; left: -8px; right: 8px; bottom: 0;
-      border: 1px solid var(--gold-dim);
-      border-bottom: none;
-      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-      opacity: 0.45;
-      z-index: -1;
-    }
-
-    @media (max-width: 860px) {
-      .about-hero-inner { grid-template-columns: 1fr; gap: 2.5rem; }
-      .about-hero-photo-wrap { max-width: 320px; }
-      .about-hero-photo { height: 300px; border-radius: var(--radius-lg); }
-      .about-hero-photo-wrap::before { border-radius: var(--radius-lg); border-bottom: 1px solid var(--gold-dim); }
-      .about-hero-text { padding-bottom: 0; }
-      .about-hero { padding-bottom: 3rem; }
+      color: #e6edf3;
     }
 
     .about-body {
@@ -224,19 +225,18 @@
 </nav>
 
 <div class="about-hero">
-  <div class="container">
-    <div class="about-hero-inner">
-      <div class="about-hero-text">
-        <p class="section-label">About Cornelius</p>
-        <h1>
-          <div class="about-headline-sm">I Didn't Plan to Be in HR.</div>
-          <div class="about-headline-lg">HR Found Me — and I Haven't Looked Back.</div>
-        </h1>
-      </div>
-      <div class="about-hero-photo-wrap">
-        <img src="images/cornelius.jpeg" alt="Cornelius Chinazam Okeke" class="about-hero-photo" />
-      </div>
-    </div>
+  <div class="about-hero-text">
+    <p class="section-label">About Cornelius</p>
+    <h1>
+      <div class="about-headline-sm">I Didn't Plan to Be in HR.</div>
+      <div class="about-headline-lg">HR Found Me — and I Haven't Looked Back.</div>
+    </h1>
+  </div>
+  <div class="about-hero-image">
+    <img
+      src="https://images.unsplash.com/photo-1521791136064-7986c2920216?w=900&q=80&auto=format&fit=crop"
+      alt="Professional HR handshake and teamwork"
+    />
   </div>
 </div>
 

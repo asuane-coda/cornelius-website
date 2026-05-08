@@ -69,8 +69,8 @@
       position: absolute;
       bottom: 1.5rem;
       left: -1.5rem;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-light);
+      background: #112240;
+      border: 1px solid rgba(41,182,246,0.3);
       border-radius: var(--radius-lg);
       padding: 0.85rem 1.25rem;
       display: flex;
@@ -158,17 +158,13 @@
       justify-content: center;
       flex-shrink: 0;
       height: 60px;
-      opacity: 0.5;
-      filter: grayscale(100%);
-      transition: opacity 0.25s, filter 0.25s, transform 0.25s;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
       cursor: pointer;
       position: relative;
       z-index: 1;
     }
 
     .logo-item:hover {
-      opacity: 1;
-      filter: grayscale(0%);
       transform: scale(1.9);
       z-index: 10;
     }
@@ -206,6 +202,7 @@
       padding: 7rem 0 5rem;
       position: relative;
       overflow: hidden;
+      background: #0d1b2e;
     }
 
     .hero::before {
@@ -215,7 +212,7 @@
       right: -15%;
       width: 600px;
       height: 600px;
-      background: radial-gradient(circle, rgba(200,169,110,0.06) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(41,182,246,0.08) 0%, transparent 70%);
       pointer-events: none;
     }
 
@@ -224,7 +221,7 @@
       font-weight: 600;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--gold);
+      color: var(--accent);
       margin-bottom: 1.5rem;
       display: flex;
       align-items: center;
@@ -236,7 +233,7 @@
       display: inline-block;
       width: 24px;
       height: 1px;
-      background: var(--gold);
+      background: var(--accent);
     }
 
     .hero-headline {
@@ -244,19 +241,33 @@
       line-height: 1.1;
       margin-bottom: 1.75rem;
       max-width: 820px;
+      color: #e6edf3;
     }
 
     .hero-headline em {
       font-style: italic;
-      color: var(--gold);
+      color: var(--accent);
     }
 
     .hero-sub {
       font-size: 1.1rem;
-      color: var(--text-muted);
+      color: #94afc8;
       max-width: 600px;
       line-height: 1.85;
       margin-bottom: 2.5rem;
+    }
+
+    .hero-badge-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .hero-badge-txt {
+      font-size: 0.72rem;
+      color: #94afc8;
+      letter-spacing: 0.04em;
     }
 
     .hero-btns {
@@ -391,15 +402,15 @@
     }
 
     .insight-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
+      background: #112240;
+      border: 1px solid rgba(41,182,246,0.15);
       border-radius: var(--radius-lg);
       padding: 1.75rem;
       transition: border-color 0.25s, transform 0.25s;
     }
 
     .insight-card:hover {
-      border-color: var(--gold-dim);
+      border-color: rgba(41,182,246,0.5);
       transform: translateY(-3px);
     }
 
@@ -408,7 +419,7 @@
       font-weight: 600;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--gold);
+      color: var(--accent);
       margin-bottom: 0.85rem;
     }
 
@@ -417,11 +428,12 @@
       font-size: 1.15rem;
       line-height: 1.4;
       margin-bottom: 0.75rem;
+      color: #e6edf3;
     }
 
     .insight-excerpt {
       font-size: 0.875rem;
-      color: var(--text-muted);
+      color: #94afc8;
       line-height: 1.7;
     }
 
@@ -433,7 +445,7 @@
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--gold);
+      color: var(--accent);
       margin-top: 1.25rem;
       transition: gap 0.2s;
     }
@@ -540,10 +552,7 @@
       </div>
     </div>
   </div>
-  <div class="hero-scroll" aria-hidden="true">
-    <div class="hero-scroll-line"></div>
-    <span>Scroll</span>
-  </div>
+
 </section>
 
 <!-- AUDIENCE CARDS -->
@@ -634,16 +643,16 @@
 </div>
 
 <!-- FEATURED INSIGHTS -->
-<section class="section">
+<section class="section" style="background:#0d1b2e;">
   <div class="container">
     <p class="section-label">Fresh Thinking</p>
     <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:1rem; margin-bottom:0.5rem;">
-      <h2 class="section-title" style="margin-bottom:0;">Fresh Thinking on HR, Work, and People</h2>
-      <a href="insights.html" style="font-size:0.8rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold); white-space:nowrap;">Read All Insights &rarr;</a>
+      <h2 class="section-title" style="margin-bottom:0; color:#e6edf3;">Fresh Thinking on HR, Work, and People</h2>
+      <a href="insights.html" style="font-size:0.8rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--accent); white-space:nowrap;">Read All Insights &rarr;</a>
     </div>
-    <p class="section-body">Every week I publish practical, honest insights on HR — for everyone, not just professionals.</p>
+    <p class="section-body" style="color:#94afc8;">Every week I publish practical, honest insights on HR — for everyone, not just professionals.</p>
     <div class="insights-grid" id="homeInsights">
-      <p style="color:var(--text-dim); font-size:0.9rem; padding:2rem 0;">Loading latest insights&hellip;</p>
+      <p style="color:#4a6080; font-size:0.9rem; padding:2rem 0;">Loading latest insights&hellip;</p>
     </div>
   </div>
 </section>

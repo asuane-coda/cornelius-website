@@ -302,13 +302,17 @@
   <div class="lock-box">
     <div class="lock-icon">&#128274;</div>
     <h1 class="lock-title">Blog Admin</h1>
-    <p class="lock-sub">Enter your admin password to manage blog posts.</p>
-    <div class="lock-error" id="lockError">Incorrect password. Please try again.</div>
+    <p class="lock-sub">Sign in with your admin credentials to manage blog posts.</p>
+    <div class="lock-error" id="lockError">Invalid email or password.</div>
     <div class="form-group" style="text-align:left;">
-      <label for="adminPassword">Password</label>
-      <input type="password" id="adminPassword" placeholder="Enter admin password" autocomplete="current-password" />
+      <label for="adminEmail">Email</label>
+      <input type="email" id="adminEmail" placeholder="admin@example.com" autocomplete="email" />
     </div>
-    <button class="btn btn-primary" id="unlockBtn" style="width:100%; margin-top:0.75rem;">Unlock</button>
+    <div class="form-group" style="text-align:left; margin-top:1rem;">
+      <label for="adminPassword">Password</label>
+      <input type="password" id="adminPassword" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+    <button class="btn btn-primary" id="unlockBtn" style="width:100%; margin-top:1.5rem;">Sign In</button>
   </div>
 </div>
 
@@ -319,7 +323,7 @@
     <div class="admin-brand">Cornelius <span>Okeke</span> &mdash; Blog Admin</div>
     <div class="topbar-actions">
       <a href="insights.html" target="_blank" class="btn btn-secondary" style="font-size:0.78rem; padding:0.45rem 1rem;">View Live Site &rarr;</a>
-      <button class="admin-lock-btn" id="lockBtn">&#128274; Lock</button>
+      <button class="admin-lock-btn" id="lockBtn">Sign Out</button>
     </div>
   </div>
 
@@ -390,20 +394,22 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/main.js"></script>
 <script>
-// ─────────────────────────────────────────────────────────────────────────────
-// IMPORTANT: Change this password before deploying the site.
-// Keep it something only Cornelius knows.
-// ─────────────────────────────────────────────────────────────────────────────
-const ADMIN_PASSWORD = 'Cornelius@HR2026';
-
-// ── LOCK / UNLOCK ─────────────────────────────────────────────────────────
-const SESSION_KEY = 'c_admin_auth';
-
-function isUnlocked() {
-  return sessionStorage.getItem(SESSION_KEY) === 'true';
+// ── AUTH LOGIC ─────────────────────────────────────────────────────────
+async function checkSession() {
+  try {
+    const session = await window.getAdminSession();
+    if (session) {
+      showAdmin();
+    } else {
+      lock();
+    }
+  } catch (e) {
+    lock();
+  }
 }
 
 function showAdmin() {
@@ -413,35 +419,49 @@ function showAdmin() {
 }
 
 function lock() {
-  sessionStorage.removeItem(SESSION_KEY);
   document.getElementById('adminShell').classList.remove('visible');
   document.getElementById('adminPassword').value = '';
   document.getElementById('lockScreen').style.display = 'flex';
 }
 
-// Auto-unlock if session is still active (page refresh)
-if (isUnlocked()) showAdmin();
+// Check session on load
+checkSession();
 
 document.getElementById('unlockBtn').addEventListener('click', tryUnlock);
 document.getElementById('adminPassword').addEventListener('keydown', e => {
   if (e.key === 'Enter') tryUnlock();
 });
 
-function tryUnlock() {
-  const val = document.getElementById('adminPassword').value;
+async function tryUnlock() {
+  const email = document.getElementById('adminEmail').value;
+  const password = document.getElementById('adminPassword').value;
   const err = document.getElementById('lockError');
-  if (val === ADMIN_PASSWORD) {
-    sessionStorage.setItem(SESSION_KEY, 'true');
+  const btn = document.getElementById('unlockBtn');
+
+  if (!email || !password) return;
+
+  btn.textContent = 'Signing In...';
+  btn.disabled = true;
+
+  try {
+    await window.adminLogin(email, password);
     err.style.display = 'none';
     showAdmin();
-  } else {
+  } catch (error) {
     err.style.display = 'block';
+    err.textContent = error.message || 'Invalid email or password.';
     document.getElementById('adminPassword').value = '';
     document.getElementById('adminPassword').focus();
+  } finally {
+    btn.textContent = 'Sign In';
+    btn.disabled = false;
   }
 }
 
-document.getElementById('lockBtn').addEventListener('click', lock);
+document.getElementById('lockBtn').addEventListener('click', async () => {
+  await window.adminLogout();
+  lock();
+});
 
 // ── TABS ─────────────────────────────────────────────────────────────────
 document.querySelectorAll('.admin-tab').forEach(tab => {

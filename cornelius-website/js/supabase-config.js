@@ -1,71 +1,91 @@
 // ─── SUPABASE CONFIG ───────────────────────────────────────────────────────
-// TODO: Replace with your actual Supabase project credentials
 // Get these from: https://supabase.com → your project → Settings → API
 const SUPABASE_URL  = 'https://vozjzeghpeeedokrxrxa.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_OJwRM7qIn7G6ogsuYn-Bow_EtYd8giz';
 
-// ─── SQL to run once in Supabase SQL editor ────────────────────────────────
-// CREATE TABLE blog_posts (
-//   id          bigserial PRIMARY KEY,
-//   title       text NOT NULL,
-//   excerpt     text,
-//   content     text,
-//   category    text DEFAULT 'Insight',
-//   published   boolean DEFAULT false,
-//   created_at  timestamptz DEFAULT now(),
-//   updated_at  timestamptz DEFAULT now()
-// );
-// ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
-// CREATE POLICY "Public read published" ON blog_posts FOR SELECT USING (published = true);
-// -- For the admin panel, disable RLS temporarily or create a service-role policy.
+// Initialize Supabase Client
+// We use sbClient to avoid name collision with the global 'supabase' library object
+const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ─── Auth Helpers ──────────────────────────────────────────────────────────
+window.adminLogin = async function(email, password) {
+  const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+  return data;
+};
+
+window.adminLogout = async function() {
+  const { error } = await sbClient.auth.signOut();
+  if (error) throw error;
+};
+
+window.getAdminSession = async function() {
+  const { data: { session } } = await sbClient.auth.getSession();
+  return session;
+};
 
 // ─── API helpers ───────────────────────────────────────────────────────────
-async function sbFetch(path, options = {}) {
-  const headers = {
-    'apikey': SUPABASE_ANON,
-    'Authorization': `Bearer ${SUPABASE_ANON}`,
-    'Content-Type': 'application/json',
-    'Prefer': 'return=representation',
-    ...options.headers
-  };
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, { ...options, headers });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Supabase error ${res.status}: ${err}`);
-  }
-  const text = await res.text();
-  return text ? JSON.parse(text) : [];
-}
-
 window.getPublishedPosts = async function(limit = 50) {
-  return sbFetch(`blog_posts?published=eq.true&order=created_at.desc&limit=${limit}`);
+  const { data, error } = await sbClient
+    .from('blog_posts')
+    .select('*')
+    .eq('published', true)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  
+  if (error) throw error;
+  return data;
 };
 
 window.getAllPosts = async function() {
-  return sbFetch('blog_posts?order=created_at.desc');
+  const { data, error } = await sbClient
+    .from('blog_posts')
+    .select('*')
+    .order('created_at', { ascending: false });
+  
+  if (error) throw error;
+  return data;
 };
 
 window.getPostById = async function(id) {
-  const rows = await sbFetch(`blog_posts?id=eq.${id}&limit=1`);
-  return rows[0] || null;
+  const { data, error } = await sbClient
+    .from('blog_posts')
+    .select('*')
+    .eq('id', id)
+    .single();
+  
+  if (error) throw error;
+  return data;
 };
 
 window.createPost = async function(post) {
-  return sbFetch('blog_posts', {
-    method: 'POST',
-    body: JSON.stringify(post)
-  });
+  const { data, error } = await sbClient
+    .from('blog_posts')
+    .insert([post])
+    .select();
+  
+  if (error) throw error;
+  return data;
 };
 
 window.updatePost = async function(id, patch) {
-  return sbFetch(`blog_posts?id=eq.${id}`, {
-    method: 'PATCH',
-    body: JSON.stringify({ ...patch, updated_at: new Date().toISOString() })
-  });
+  const { data, error } = await sbClient
+    .from('blog_posts')
+    .update({ ...patch, updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select();
+  
+  if (error) throw error;
+  return data;
 };
 
 window.deletePost = async function(id) {
-  return sbFetch(`blog_posts?id=eq.${id}`, { method: 'DELETE' });
+  const { error } = await sbClient
+    .from('blog_posts')
+    .delete()
+    .eq('id', id);
+  
+  if (error) throw error;
 };
 
 window.escapeHtml = function(str) {

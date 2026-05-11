@@ -1,6 +1,7 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/index.html" }
+    { "source": "/", "destination": "/cornelius-website/index.html" },
+    { "source": "/(.*)", "destination": "/cornelius-website/$1" }
   ],
   "cleanUrls": true,
   "trailingSlash": false

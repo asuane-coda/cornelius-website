@@ -1,0 +1,2 @@
+# Ignore local env file that contains sensitive keys
+/cornelius-website/js/env.js

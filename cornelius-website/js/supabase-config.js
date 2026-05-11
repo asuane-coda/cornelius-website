@@ -1,11 +1,24 @@
 // ─── SUPABASE CONFIG ───────────────────────────────────────────────────────
-// Get these from: https://supabase.com → your project → Settings → API
-const SUPABASE_URL  = 'https://vozjzeghpeeedokrxrxa.supabase.co';
-const SUPABASE_ANON = 'sb_publishable_OJwRM7qIn7G6ogsuYn-Bow_EtYd8giz';
+// Values are injected at build-time into `js/env.js` (window.__ENV).
+// On Vercel, set `SUPABASE_URL` and `SUPABASE_ANON` in Project > Environment Variables.
+const SUPABASE_URL = (window.__ENV && window.__ENV.SUPABASE_URL) || '';
+const SUPABASE_ANON = (window.__ENV && window.__ENV.SUPABASE_ANON) || '';
 
-// Initialize Supabase Client
-// We use sbClient to avoid name collision with the global 'supabase' library object
-const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+// Initialize Supabase Client (guard when env not provided)
+let sbClient;
+if (SUPABASE_URL && SUPABASE_ANON && window.supabase && typeof window.supabase.createClient === 'function') {
+  sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+} else {
+  console.warn('Supabase not configured. Set SUPABASE_URL and SUPABASE_ANON environment variables.');
+  sbClient = {
+    auth: {
+      signInWithPassword: async () => { throw new Error('Supabase not configured'); },
+      signOut: async () => { throw new Error('Supabase not configured'); },
+      getSession: async () => ({ data: { session: null } })
+    },
+    from: () => ({ select: async () => { throw new Error('Supabase not configured'); } })
+  };
+}
 
 // ─── Auth Helpers ──────────────────────────────────────────────────────────
 window.adminLogin = async function(email, password) {

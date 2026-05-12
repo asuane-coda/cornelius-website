@@ -405,13 +405,39 @@
       background: #112240;
       border: 1px solid rgba(41,182,246,0.15);
       border-radius: var(--radius-lg);
-      padding: 1.75rem;
+      padding: 0;
       transition: border-color 0.25s, transform 0.25s;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     .insight-card:hover {
       border-color: rgba(41,182,246,0.5);
       transform: translateY(-3px);
+    }
+
+    .insight-card-image {
+      width: 100%;
+      height: 160px;
+      overflow: hidden;
+      background: #0d1b2e;
+    }
+
+    .insight-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+
+    .insight-card:hover .insight-card-image img { transform: scale(1.05); }
+
+    .insight-card-body {
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
 
     .insight-tag {
@@ -435,6 +461,7 @@
       font-size: 0.875rem;
       color: #94afc8;
       line-height: 1.7;
+      flex: 1;
     }
 
     .insight-read {
@@ -449,6 +476,7 @@
       margin-top: 1.25rem;
       transition: gap 0.2s;
     }
+
 
     .insight-card:hover .insight-read { gap: 0.65rem; }
 
@@ -708,14 +736,24 @@
       grid.innerHTML = '<p style="color:var(--text-dim);font-size:0.9rem;padding:2rem 0;">No posts yet — check back soon.</p>';
       return;
     }
-    grid.innerHTML = posts.map(p => `
-      <div class="insight-card">
-        <p class="insight-tag">${escapeHtml(p.category || 'Insight')}</p>
-        <h3 class="insight-title">${escapeHtml(p.title)}</h3>
-        <p class="insight-excerpt">${escapeHtml((p.excerpt || '').substring(0, 160))}${(p.excerpt || '').length > 160 ? '…' : ''}</p>
-        <a href="insights.html#post-${p.id}" class="insight-read">Read More &rarr;</a>
-      </div>
-    `).join('');
+    grid.innerHTML = posts.map(p => {
+      const hasImg = p.image_url && p.image_url.trim() !== '';
+      return `
+        <div class="insight-card">
+          ${hasImg ? `
+            <div class="insight-card-image">
+              <img src="${p.image_url}" alt="${escapeHtml(p.title)}" />
+            </div>
+          ` : ''}
+          <div class="insight-card-body">
+            <p class="insight-tag">${escapeHtml(p.category || 'Insight')}</p>
+            <h3 class="insight-title">${escapeHtml(p.title)}</h3>
+            <p class="insight-excerpt">${escapeHtml((p.excerpt || '').substring(0, 160))}${(p.excerpt || '').length > 160 ? '…' : ''}</p>
+            <a href="insights.html#post-${p.id}" class="insight-read">Read More &rarr;</a>
+          </div>
+        </div>
+      `;
+    }).join('');
   } catch (e) {
     console.error('Could not load insights:', e);
   }

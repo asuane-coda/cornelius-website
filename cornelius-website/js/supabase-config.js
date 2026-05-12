@@ -101,6 +101,24 @@ window.deletePost = async function(id) {
   if (error) throw error;
 };
 
+window.uploadImage = async function(file) {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+  const filePath = `blog/${fileName}`;
+
+  const { data, error } = await sbClient.storage
+    .from('images')
+    .upload(filePath, file);
+
+  if (error) throw error;
+
+  const { data: { publicUrl } } = sbClient.storage
+    .from('images')
+    .getPublicUrl(filePath);
+
+  return publicUrl;
+};
+
 window.escapeHtml = function(str) {
   if (!str) return '';
   return String(str)

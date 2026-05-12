@@ -366,6 +366,17 @@
             <option value="AI & The Future of Work">AI &amp; The Future of Work</option>
           </select>
         </div>
+        <div class="form-group">
+          <label for="postImage">Featured Image URL</label>
+          <div style="display:flex; gap:0.5rem;">
+            <input type="text" id="postImage" placeholder="https://..." style="flex:1;" />
+            <input type="file" id="imageUpload" style="display:none;" accept="image/*" />
+            <button class="act-btn" onclick="document.getElementById('imageUpload').click()">Upload</button>
+          </div>
+          <div id="imagePreview" style="margin-top:0.5rem; display:none;">
+            <img src="" id="previewImg" style="max-height:100px; border-radius:var(--radius);" />
+          </div>
+        </div>
       </div>
 
       <div class="form-group">
@@ -557,7 +568,16 @@ async function loadPosts() {
         document.getElementById('postExcerpt').value    = post.excerpt  || '';
         document.getElementById('postContent').value    = post.content  || '';
         document.getElementById('postCategory').value   = post.category || 'For Employees';
+        document.getElementById('postImage').value      = post.image_url || '';
         document.getElementById('postPublished').checked = !!post.published;
+        
+        if (post.image_url) {
+          document.getElementById('previewImg').src = post.image_url;
+          document.getElementById('imagePreview').style.display = 'block';
+        } else {
+          document.getElementById('imagePreview').style.display = 'none';
+        }
+
         document.getElementById('cancelEditBtn').style.display = 'inline-block';
         document.querySelector('[data-tab="new"]').textContent = 'Edit Post';
         updateExcerptCount();
@@ -581,6 +601,41 @@ async function loadPosts() {
   }
 }
 
+// ── IMAGE UPLOAD ──────────────────────────────────────────────────────
+document.getElementById('imageUpload').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const btn = document.querySelector('button[onclick*="imageUpload"]');
+  const originalText = btn.textContent;
+  btn.textContent = 'Uploading...';
+  btn.disabled = true;
+
+  try {
+    const url = await window.uploadImage(file);
+    document.getElementById('postImage').value = url;
+    document.getElementById('previewImg').src = url;
+    document.getElementById('imagePreview').style.display = 'block';
+    showToast('Image uploaded!', 'success');
+  } catch (err) {
+    console.error(err);
+    showToast('Upload failed. Ensure you have an "images" bucket in Supabase.', 'error');
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
+});
+
+document.getElementById('postImage').addEventListener('input', (e) => {
+  const url = e.target.value.trim();
+  if (url) {
+    document.getElementById('previewImg').src = url;
+    document.getElementById('imagePreview').style.display = 'block';
+  } else {
+    document.getElementById('imagePreview').style.display = 'none';
+  }
+});
+
 // ── SAVE POST ─────────────────────────────────────────────────────────
 document.getElementById('saveBtn').addEventListener('click', async () => {
   const id        = document.getElementById('editId').value;
@@ -588,6 +643,7 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   const excerpt   = document.getElementById('postExcerpt').value.trim();
   const content   = document.getElementById('postContent').value.trim();
   const category  = document.getElementById('postCategory').value;
+  const image_url = document.getElementById('postImage').value.trim();
   const published = document.getElementById('postPublished').checked;
 
   if (!title)   { showToast('Please add a title.', 'error');   return; }
@@ -599,11 +655,12 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   btn.disabled = true;
 
   try {
+    const postData = { title, excerpt, content, category, image_url, published };
     if (id) {
-      await window.updatePost(+id, { title, excerpt, content, category, published });
+      await window.updatePost(+id, postData);
       showToast('Post updated successfully!', 'success');
     } else {
-      await window.createPost({ title, excerpt, content, category, published });
+      await window.createPost(postData);
       showToast('Post created successfully!', 'success');
     }
     resetEditor();
@@ -628,7 +685,9 @@ function resetEditor() {
   document.getElementById('postExcerpt').value    = '';
   document.getElementById('postContent').value    = '';
   document.getElementById('postCategory').value   = 'For Employees';
+  document.getElementById('postImage').value      = '';
   document.getElementById('postPublished').checked = false;
+  document.getElementById('imagePreview').style.display = 'none';
   document.getElementById('cancelEditBtn').style.display = 'none';
   document.querySelector('[data-tab="new"]').textContent = 'New Post';
   updateExcerptCount();

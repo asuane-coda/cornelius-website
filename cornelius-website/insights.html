@@ -130,14 +130,38 @@
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 1.75rem;
+      padding: 0;
       cursor: pointer;
       transition: border-color 0.25s, transform 0.25s;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
     .post-card:hover { border-color: var(--gold-dim); transform: translateY(-3px); }
+
+    .post-card-image {
+      width: 100%;
+      height: 180px;
+      background: #0d1b2e;
+      overflow: hidden;
+    }
+
+    .post-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+
+    .post-card:hover .post-card-image img { transform: scale(1.05); }
+
+    .post-card-body {
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
 
     .post-meta {
       display: flex;
@@ -184,29 +208,49 @@
       border-radius: var(--radius-lg);
       max-width: 720px;
       width: 100%;
-      padding: 3rem;
+      padding: 0;
       position: relative;
+      overflow: hidden;
+    }
+
+    .post-modal-image {
+      width: 100%;
+      max-height: 380px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .post-modal-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .post-modal-body {
+      padding: 3rem;
     }
 
     .post-modal-close {
       position: absolute;
       top: 1.5rem; right: 1.5rem;
-      background: none;
-      border: 1px solid var(--border-light);
-      color: var(--text-muted);
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
       width: 36px; height: 36px;
       border-radius: 50%;
       cursor: pointer;
       font-size: 1rem;
       display: flex; align-items: center; justify-content: center;
-      transition: color 0.2s, border-color 0.2s;
+      transition: background 0.2s;
+      z-index: 10;
     }
 
-    .post-modal-close:hover { color: var(--text); border-color: var(--text); }
+    .post-modal-close:hover { background: var(--gold); }
     .post-modal-cat { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
     .post-modal-title { font-size: clamp(1.5rem, 3vw, 2.25rem); margin-bottom: 0.75rem; }
     .post-modal-date { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 2rem; }
     .post-modal-content { font-size: 1rem; line-height: 1.9; color: var(--text-muted); white-space: pre-wrap; }
+
   </style>
 </head>
 <body>
@@ -266,10 +310,15 @@
 <div class="post-overlay" id="postOverlay">
   <div class="post-modal">
     <button class="post-modal-close" id="postModalClose" aria-label="Close">&times;</button>
-    <p class="post-modal-cat" id="modalCat"></p>
-    <h2 class="post-modal-title" id="modalTitle"></h2>
-    <p class="post-modal-date" id="modalDate"></p>
-    <div class="post-modal-content" id="modalContent"></div>
+    <div class="post-modal-image" id="modalImageWrap">
+      <img src="" id="modalImg" alt="Post featured image" />
+    </div>
+    <div class="post-modal-body">
+      <p class="post-modal-cat" id="modalCat"></p>
+      <h2 class="post-modal-title" id="modalTitle"></h2>
+      <p class="post-modal-date" id="modalDate"></p>
+      <div class="post-modal-content" id="modalContent"></div>
+    </div>
   </div>
 </div>
 
@@ -317,17 +366,27 @@ function renderPosts() {
     return;
   }
 
-  grid.innerHTML = filtered.map(p => `
-    <div class="post-card" data-id="${p.id}">
-      <div class="post-meta">
-        <span class="post-category">${escapeHtml(p.category)}</span>
-        <span class="post-date">${formatDate(p.created_at)}</span>
+  grid.innerHTML = filtered.map(p => {
+    const hasImg = p.image_url && p.image_url.trim() !== '';
+    return `
+      <div class="post-card" data-id="${p.id}">
+        ${hasImg ? `
+          <div class="post-card-image">
+            <img src="${p.image_url}" alt="${escapeHtml(p.title)}" />
+          </div>
+        ` : ''}
+        <div class="post-card-body">
+          <div class="post-meta">
+            <span class="post-category">${escapeHtml(p.category)}</span>
+            <span class="post-date">${formatDate(p.created_at)}</span>
+          </div>
+          <h3 class="post-title">${escapeHtml(p.title)}</h3>
+          <p class="post-excerpt">${escapeHtml((p.excerpt||'').substring(0,160))}${(p.excerpt||'').length>160?'…':''}</p>
+          <span class="post-read">Read More &rarr;</span>
+        </div>
       </div>
-      <h3 class="post-title">${escapeHtml(p.title)}</h3>
-      <p class="post-excerpt">${escapeHtml((p.excerpt||'').substring(0,160))}${(p.excerpt||'').length>160?'…':''}</p>
-      <span class="post-read">Read More &rarr;</span>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 
   grid.querySelectorAll('.post-card').forEach(card => {
     card.addEventListener('click', () => openPost(+card.dataset.id));
@@ -345,6 +404,15 @@ document.getElementById('filterBar').addEventListener('click', e => {
 function openPost(id) {
   const p = allPosts.find(x => x.id === id);
   if (!p) return;
+  
+  const modalImgWrap = document.getElementById('modalImageWrap');
+  if (p.image_url) {
+    document.getElementById('modalImg').src = p.image_url;
+    modalImgWrap.style.display = 'block';
+  } else {
+    modalImgWrap.style.display = 'none';
+  }
+
   document.getElementById('modalCat').textContent     = p.category || '';
   document.getElementById('modalTitle').textContent   = p.title    || '';
   document.getElementById('modalDate').textContent    = formatDate(p.created_at);

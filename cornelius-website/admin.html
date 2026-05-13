@@ -367,15 +367,16 @@
           </select>
         </div>
         <div class="form-group">
-          <label for="postImage">Featured Image URL</label>
-          <div style="display:flex; gap:0.5rem;">
-            <input type="text" id="postImage" placeholder="https://..." style="flex:1;" />
-            <input type="file" id="imageUpload" style="display:none;" accept="image/*" />
-            <button class="act-btn" onclick="document.getElementById('imageUpload').click()">Upload</button>
+          <label>Post Images</label>
+          <div id="imageUploadArea" style="border: 2px dashed var(--border-light); padding: 2rem; text-align: center; border-radius: var(--radius-lg); cursor: pointer; transition: border-color 0.2s;">
+            <p style="color: var(--text-dim); margin-bottom: 0.5rem;">Click or drag to upload pictures from your device</p>
+            <input type="file" id="imageUpload" style="display:none;" accept="image/*" multiple />
+            <button class="btn btn-secondary" onclick="document.getElementById('imageUpload').click()" style="font-size: 0.8rem;">Select Files</button>
           </div>
-          <div id="imagePreview" style="margin-top:0.5rem; display:none;">
-            <img src="" id="previewImg" style="max-height:100px; border-radius:var(--radius);" />
+          <div id="imagePreviewList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            <!-- Uploaded images will appear here -->
           </div>
+          <input type="hidden" id="postImages" value="[]" />
         </div>
       </div>
 
@@ -568,15 +569,19 @@ async function loadPosts() {
         document.getElementById('postExcerpt').value    = post.excerpt  || '';
         document.getElementById('postContent').value    = post.content  || '';
         document.getElementById('postCategory').value   = post.category || 'For Employees';
-        document.getElementById('postImage').value      = post.image_url || '';
         document.getElementById('postPublished').checked = !!post.published;
         
-        if (post.image_url) {
-          document.getElementById('previewImg').src = post.image_url;
-          document.getElementById('imagePreview').style.display = 'block';
-        } else {
-          document.getElementById('imagePreview').style.display = 'none';
+        // Handle images
+        let images = [];
+        try {
+          images = JSON.parse(post.image_url || '[]');
+          if (typeof images === 'string') images = [images]; // migration fallback
+        } catch (e) {
+          images = post.image_url ? [post.image_url] : [];
         }
+        
+        document.getElementById('postImages').value = JSON.stringify(images);
+        renderImagePreviews();
 
         document.getElementById('cancelEditBtn').style.display = 'inline-block';
         document.querySelector('[data-tab="new"]').textContent = 'Edit Post';
@@ -603,38 +608,53 @@ async function loadPosts() {
 
 // ── IMAGE UPLOAD ──────────────────────────────────────────────────────
 document.getElementById('imageUpload').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
 
-  const btn = document.querySelector('button[onclick*="imageUpload"]');
+  const btn = document.querySelector('#imageUploadArea button');
   const originalText = btn.textContent;
   btn.textContent = 'Uploading...';
   btn.disabled = true;
 
   try {
-    const url = await window.uploadImage(file);
-    document.getElementById('postImage').value = url;
-    document.getElementById('previewImg').src = url;
-    document.getElementById('imagePreview').style.display = 'block';
-    showToast('Image uploaded!', 'success');
+    const currentImages = JSON.parse(document.getElementById('postImages').value || '[]');
+    
+    for (const file of files) {
+      const url = await window.uploadImage(file);
+      currentImages.push(url);
+    }
+    
+    document.getElementById('postImages').value = JSON.stringify(currentImages);
+    renderImagePreviews();
+    showToast(`${files.length} image(s) uploaded!`, 'success');
   } catch (err) {
     console.error(err);
     showToast('Upload failed. Ensure you have an "images" bucket in Supabase.', 'error');
   } finally {
     btn.textContent = originalText;
     btn.disabled = false;
+    e.target.value = ''; // Reset file input
   }
 });
 
-document.getElementById('postImage').addEventListener('input', (e) => {
-  const url = e.target.value.trim();
-  if (url) {
-    document.getElementById('previewImg').src = url;
-    document.getElementById('imagePreview').style.display = 'block';
-  } else {
-    document.getElementById('imagePreview').style.display = 'none';
-  }
-});
+function renderImagePreviews() {
+  const list = document.getElementById('imagePreviewList');
+  const images = JSON.parse(document.getElementById('postImages').value || '[]');
+  
+  list.innerHTML = images.map((url, idx) => `
+    <div style="position:relative; aspect-ratio:1; border-radius:var(--radius); overflow:hidden; border:1px solid var(--border-light);">
+      <img src="${url}" style="width:100%; height:100%; object-fit:cover;" />
+      <button onclick="removeImage(${idx})" style="position:absolute; top:4px; right:4px; background:rgba(200,90,90,0.8); color:white; border:none; border-radius:50%; width:20px; height:20px; cursor:pointer; font-size:12px; display:flex; align-items:center; justify-content:center;">&times;</button>
+    </div>
+  `).join('');
+}
+
+window.removeImage = function(idx) {
+  const images = JSON.parse(document.getElementById('postImages').value || '[]');
+  images.splice(idx, 1);
+  document.getElementById('postImages').value = JSON.stringify(images);
+  renderImagePreviews();
+};
 
 // ── SAVE POST ─────────────────────────────────────────────────────────
 document.getElementById('saveBtn').addEventListener('click', async () => {
@@ -643,7 +663,7 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   const excerpt   = document.getElementById('postExcerpt').value.trim();
   const content   = document.getElementById('postContent').value.trim();
   const category  = document.getElementById('postCategory').value;
-  const image_url = document.getElementById('postImage').value.trim();
+  const image_url = document.getElementById('postImages').value; // Stores JSON array
   const published = document.getElementById('postPublished').checked;
 
   if (!title)   { showToast('Please add a title.', 'error');   return; }
@@ -685,9 +705,9 @@ function resetEditor() {
   document.getElementById('postExcerpt').value    = '';
   document.getElementById('postContent').value    = '';
   document.getElementById('postCategory').value   = 'For Employees';
-  document.getElementById('postImage').value      = '';
+  document.getElementById('postImages').value     = '[]';
   document.getElementById('postPublished').checked = false;
-  document.getElementById('imagePreview').style.display = 'none';
+  document.getElementById('imagePreviewList').innerHTML = '';
   document.getElementById('cancelEditBtn').style.display = 'none';
   document.querySelector('[data-tab="new"]').textContent = 'New Post';
   updateExcerptCount();

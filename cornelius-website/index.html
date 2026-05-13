@@ -737,12 +737,20 @@
       return;
     }
     grid.innerHTML = posts.map(p => {
-      const hasImg = p.image_url && p.image_url.trim() !== '';
+      let images = [];
+      try {
+        images = JSON.parse(p.image_url || '[]');
+        if (typeof images === 'string') images = [images];
+      } catch (e) {
+        images = p.image_url ? [p.image_url] : [];
+      }
+      
+      const hasImg = images.length > 0;
       return `
         <div class="insight-card">
           ${hasImg ? `
             <div class="insight-card-image">
-              <img src="${p.image_url}" alt="${escapeHtml(p.title)}" />
+              <img src="${images[0]}" alt="${escapeHtml(p.title)}" />
             </div>
           ` : ''}
           <div class="insight-card-body">

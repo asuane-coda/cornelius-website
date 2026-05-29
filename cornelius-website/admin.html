@@ -495,6 +495,7 @@
             <button class="toolbar-btn" id="leftAlignBtn" title="Align Left">⬅ Left</button>
             <button class="toolbar-btn" id="centerAlignBtn" title="Align Center">⬆ Center</button>
             <button class="toolbar-btn" id="rightAlignBtn" title="Align Right">Right ➡</button>
+            <button class="toolbar-btn" id="justifyBtn" title="Justify">≡ Justify</button>
           </div>
           <div class="editor-toolbar-group">
             <button class="toolbar-btn" id="clearBtn" title="Clear Formatting">Clear</button>
@@ -842,7 +843,8 @@ const formatButtons = {
   insertOrderedList: { cmd: 'insertOrderedList', id: 'numberBtn' },
   justifyLeft: { cmd: 'justifyLeft', id: 'leftAlignBtn' },
   justifyCenter: { cmd: 'justifyCenter', id: 'centerAlignBtn' },
-  justifyRight: { cmd: 'justifyRight', id: 'rightAlignBtn' }
+  justifyRight: { cmd: 'justifyRight', id: 'rightAlignBtn' },
+  justifyFull: { cmd: 'justifyFull', id: 'justifyBtn' }
 };
 
 // Handle toolbar button clicks
@@ -887,6 +889,7 @@ function updateToolbarStates() {
   document.getElementById('leftAlignBtn').classList.toggle('active', document.queryCommandState('justifyLeft'));
   document.getElementById('centerAlignBtn').classList.toggle('active', document.queryCommandState('justifyCenter'));
   document.getElementById('rightAlignBtn').classList.toggle('active', document.queryCommandState('justifyRight'));
+  document.getElementById('justifyBtn').classList.toggle('active', document.queryCommandState('justifyFull'));
 }
 
 // Update toolbar states on selection change

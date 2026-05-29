@@ -290,9 +290,90 @@
 
     .stat-label { font-size: 0.75rem; color: var(--text-muted); }
 
+    /* RICH TEXT EDITOR */
+    .editor-toolbar {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      padding: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-bottom: none;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      align-items: center;
+    }
+
+    .editor-toolbar-group {
+      display: flex;
+      gap: 0.3rem;
+      align-items: center;
+      border-right: 1px solid var(--border-light);
+      padding-right: 0.5rem;
+    }
+
+    .editor-toolbar-group:last-child { border-right: none; padding-right: 0; }
+
+    .toolbar-btn {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.75rem;
+      padding: 0.35rem 0.6rem;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      min-width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toolbar-btn:hover { color: var(--text); border-color: var(--gold-dim); }
+    .toolbar-btn.active { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+
+    .toolbar-select {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.75rem;
+      padding: 0.35rem 0.6rem;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      height: 32px;
+    }
+
+    .toolbar-select:hover { color: var(--text); border-color: var(--gold-dim); }
+    .toolbar-select:focus { outline: none; border-color: var(--gold); color: var(--text); }
+
+    .editor-content {
+      min-height: 320px;
+      padding: 1rem;
+      background: transparent;
+      border: 1px solid var(--border-light);
+      border-top: none;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.6;
+      outline: none;
+      overflow-y: auto;
+    }
+
+    .editor-content:focus { border-color: var(--gold-dim); }
+    .editor-content p { margin-bottom: 0.75rem; }
+    .editor-content ul { margin: 0.75rem 0; margin-left: 1.5rem; }
+    .editor-content li { margin-bottom: 0.4rem; }
+
     @media (max-width: 640px) {
       .post-list-item { flex-direction: column; }
       .post-list-actions { width: 100%; }
+      .editor-toolbar { flex-direction: column; align-items: flex-start; }
+      .editor-toolbar-group { border-right: none; border-bottom: 1px solid var(--border-light); padding-right: 0; padding-bottom: 0.5rem; width: 100%; }
+      .editor-toolbar-group:last-child { border-bottom: none; }
     }
   </style>
 </head>
@@ -389,7 +470,37 @@
 
       <div class="form-group">
         <label for="postContent">Full Post Content</label>
-        <textarea id="postContent" placeholder="Write the full article here…" style="min-height:320px;"></textarea>
+        <div class="editor-toolbar" id="editorToolbar">
+          <div class="editor-toolbar-group">
+            <select id="fontSelector" class="toolbar-select">
+              <option value="">Default Font</option>
+              <option value="Arial">Arial</option>
+              <option value="Georgia">Georgia</option>
+              <option value="'Courier New'">Courier New</option>
+              <option value="'Times New Roman'">Times New Roman</option>
+              <option value="'Trebuchet MS'">Trebuchet MS</option>
+              <option value="Verdana">Verdana</option>
+            </select>
+          </div>
+          <div class="editor-toolbar-group">
+            <button class="toolbar-btn" id="boldBtn" title="Bold (Ctrl+B)"><strong>B</strong></button>
+            <button class="toolbar-btn" id="italicBtn" title="Italic (Ctrl+I)"><em>I</em></button>
+            <button class="toolbar-btn" id="underlineBtn" title="Underline (Ctrl+U)"><u>U</u></button>
+          </div>
+          <div class="editor-toolbar-group">
+            <button class="toolbar-btn" id="bulletBtn" title="Bullet List">• List</button>
+            <button class="toolbar-btn" id="numberBtn" title="Numbered List">1. List</button>
+          </div>
+          <div class="editor-toolbar-group">
+            <button class="toolbar-btn" id="leftAlignBtn" title="Align Left">⬅ Left</button>
+            <button class="toolbar-btn" id="centerAlignBtn" title="Align Center">⬆ Center</button>
+            <button class="toolbar-btn" id="rightAlignBtn" title="Align Right">Right ➡</button>
+          </div>
+          <div class="editor-toolbar-group">
+            <button class="toolbar-btn" id="clearBtn" title="Clear Formatting">Clear</button>
+          </div>
+        </div>
+        <div id="postContent" class="editor-content" contenteditable="true" data-placeholder="Write the full article here…"></div>
       </div>
 
       <div class="editor-actions">
@@ -568,7 +679,7 @@ async function loadPosts() {
         document.getElementById('editId').value         = post.id;
         document.getElementById('postTitle').value      = post.title    || '';
         document.getElementById('postExcerpt').value    = post.excerpt  || '';
-        document.getElementById('postContent').value    = post.content  || '';
+        document.getElementById('postContent').innerHTML = post.content  || '';
         document.getElementById('postCategory').value   = post.category || 'For Employees';
         document.getElementById('postPublished').checked = !!post.published;
         
@@ -662,7 +773,7 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   const id        = document.getElementById('editId').value;
   const title     = document.getElementById('postTitle').value.trim();
   const excerpt   = document.getElementById('postExcerpt').value.trim();
-  const content   = document.getElementById('postContent').value.trim();
+  const content   = document.getElementById('postContent').innerHTML.trim();
   const category  = document.getElementById('postCategory').value;
   const image_url = document.getElementById('postImages').value; // Stores JSON array
   const published = document.getElementById('postPublished').checked;
@@ -704,7 +815,7 @@ function resetEditor() {
   document.getElementById('editId').value         = '';
   document.getElementById('postTitle').value      = '';
   document.getElementById('postExcerpt').value    = '';
-  document.getElementById('postContent').value    = '';
+  document.getElementById('postContent').innerHTML = '';
   document.getElementById('postCategory').value   = 'For Employees';
   document.getElementById('postImages').value     = '[]';
   document.getElementById('postPublished').checked = false;
@@ -720,6 +831,76 @@ function updateExcerptCount() {
 }
 
 document.getElementById('postExcerpt').addEventListener('input', updateExcerptCount);
+
+// ── RICH TEXT EDITOR FUNCTIONS ───────────────────────────────────────
+const editor = document.getElementById('postContent');
+const formatButtons = {
+  bold: { cmd: 'bold', id: 'boldBtn' },
+  italic: { cmd: 'italic', id: 'italicBtn' },
+  underline: { cmd: 'underline', id: 'underlineBtn' },
+  insertUnorderedList: { cmd: 'insertUnorderedList', id: 'bulletBtn' },
+  insertOrderedList: { cmd: 'insertOrderedList', id: 'numberBtn' },
+  justifyLeft: { cmd: 'justifyLeft', id: 'leftAlignBtn' },
+  justifyCenter: { cmd: 'justifyCenter', id: 'centerAlignBtn' },
+  justifyRight: { cmd: 'justifyRight', id: 'rightAlignBtn' }
+};
+
+// Handle toolbar button clicks
+Object.values(formatButtons).forEach(btn => {
+  const element = document.getElementById(btn.id);
+  if (element) {
+    element.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.execCommand(btn.cmd, false, null);
+      editor.focus();
+      updateToolbarStates();
+    });
+  }
+});
+
+// Font selector
+document.getElementById('fontSelector').addEventListener('change', (e) => {
+  e.preventDefault();
+  const font = e.target.value;
+  if (font) {
+    document.execCommand('fontName', false, font);
+  }
+  editor.focus();
+});
+
+// Clear formatting
+document.getElementById('clearBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  document.execCommand('removeFormat', false, null);
+  document.execCommand('clearFormatting', false, null);
+  editor.focus();
+  updateToolbarStates();
+});
+
+// Update toolbar button states based on current selection
+function updateToolbarStates() {
+  document.getElementById('boldBtn').classList.toggle('active', document.queryCommandState('bold'));
+  document.getElementById('italicBtn').classList.toggle('active', document.queryCommandState('italic'));
+  document.getElementById('underlineBtn').classList.toggle('active', document.queryCommandState('underline'));
+  document.getElementById('bulletBtn').classList.toggle('active', document.queryCommandState('insertUnorderedList'));
+  document.getElementById('numberBtn').classList.toggle('active', document.queryCommandState('insertOrderedList'));
+  document.getElementById('leftAlignBtn').classList.toggle('active', document.queryCommandState('justifyLeft'));
+  document.getElementById('centerAlignBtn').classList.toggle('active', document.queryCommandState('justifyCenter'));
+  document.getElementById('rightAlignBtn').classList.toggle('active', document.queryCommandState('justifyRight'));
+}
+
+// Update toolbar states on selection change
+editor.addEventListener('mouseup', updateToolbarStates);
+editor.addEventListener('keyup', updateToolbarStates);
+editor.addEventListener('click', updateToolbarStates);
+
+// Handle Enter key to create paragraphs
+editor.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    document.execCommand('insertParagraph', false, null);
+  }
+});
 </script>
 </body>
 </html>

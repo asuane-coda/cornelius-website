@@ -250,7 +250,11 @@
     .post-modal-cat { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
     .post-modal-title { font-size: clamp(1.5rem, 3vw, 2.25rem); margin-bottom: 0.75rem; }
     .post-modal-date { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 2rem; }
-    .post-modal-content { font-size: 1rem; line-height: 1.9; color: var(--text-muted); white-space: pre-wrap; }
+    .post-modal-content { font-size: 1rem; line-height: 1.9; color: var(--text-muted); }
+    .post-modal-content p { margin-bottom: 1rem; }
+    .post-modal-content ul { margin: 1rem 0; margin-left: 1.5rem; }
+    .post-modal-content ol { margin: 1rem 0; margin-left: 1.5rem; }
+    .post-modal-content li { margin-bottom: 0.5rem; }
 
   </style>
 </head>
@@ -433,7 +437,7 @@ function openPost(id) {
   document.getElementById('modalCat').textContent     = p.category || '';
   document.getElementById('modalTitle').textContent   = p.title    || '';
   document.getElementById('modalDate').textContent    = formatDate(p.created_at);
-  document.getElementById('modalContent').textContent = p.content  || '';
+  document.getElementById('modalContent').innerHTML   = p.content  || '';
   document.getElementById('postOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }

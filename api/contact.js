@@ -6,6 +6,8 @@
 //   MJ_APIKEY_PRIVATE  → your Mailjet secret key
 
 module.exports = async function handler(req, res) {
+  console.log('API_CONTACT_CALLED', { method: req.method });
+
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -22,6 +24,7 @@ module.exports = async function handler(req, res) {
   const secretKey = process.env.MJ_APIKEY_PRIVATE;
 
   if (!apiKey || !secretKey) {
+    console.error('MAILJET_CONFIG_ERROR: Missing keys');
     return res.status(500).json({ error: 'Email service not configured.' });
   }
 
@@ -67,6 +70,7 @@ ${message}
   };
 
   try {
+    console.log('SENDING_TO_MAILJET', { from_email, subject });
     const response = await fetch('https://api.mailjet.com/v3.1/send', {
       method:  'POST',
       headers: {
@@ -76,16 +80,19 @@ ${message}
       body: JSON.stringify(payload)
     });
 
+    const status = response.status;
+    const responseText = await response.text();
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Mailjet error:', errorText);
-      return res.status(500).json({ error: 'Failed to send email.' });
+      console.error('MAILJET_API_ERROR:', status, responseText);
+      return res.status(500).json({ error: 'Failed to send email.', details: responseText });
     }
 
-    return res.status(200).json({ success: true });
+    console.log('MAILJET_SUCCESS', responseText);
+    return res.status(200).json({ success: true, raw: responseText });
 
   } catch (err) {
-    console.error('Server error:', err);
-    return res.status(500).json({ error: 'Server error. Please try again.' });
+    console.error('SERVER_EXCEPTION:', err);
+    return res.status(500).json({ error: 'Server error. Please try again.', message: err.message });
   }
 }

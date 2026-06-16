@@ -267,6 +267,7 @@ document.getElementById('contactForm').addEventListener('submit', async function
   btn.textContent = 'Sending…';
   btn.disabled = true;
 
+  let text = '';
   try {
     const res = await fetch('/api/contact', {
       method:  'POST',
@@ -274,7 +275,7 @@ document.getElementById('contactForm').addEventListener('submit', async function
       body: JSON.stringify({ from_name: name, from_email: email, subject, message })
     });
 
-    const text = await res.text();
+    text = await res.text();
     let data;
     try {
       data = JSON.parse(text);

@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cornelius Chinazam Okeke | HR People & Systems Architect</title>
-  <link rel="icon" type="image/png" href="images/favicon.png">
   <meta name="description" content="HR People and Systems Architect, ACIPM — the go-to voice for employees, employers, and job seekers navigating the world of work in Nigeria." />
   <meta property="og:title" content="Cornelius Chinazam Okeke | HR Systems Architect" />
   <meta property="og:description" content="Building the Future of HR, One Person at a Time." />
@@ -406,39 +405,13 @@
       background: #112240;
       border: 1px solid rgba(41,182,246,0.15);
       border-radius: var(--radius-lg);
-      padding: 0;
+      padding: 1.75rem;
       transition: border-color 0.25s, transform 0.25s;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
     }
 
     .insight-card:hover {
       border-color: rgba(41,182,246,0.5);
       transform: translateY(-3px);
-    }
-
-    .insight-card-image {
-      width: 100%;
-      height: 160px;
-      overflow: hidden;
-      background: #0d1b2e;
-    }
-
-    .insight-card-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.5s;
-    }
-
-    .insight-card:hover .insight-card-image img { transform: scale(1.05); }
-
-    .insight-card-body {
-      padding: 1.75rem;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
     }
 
     .insight-tag {
@@ -462,7 +435,6 @@
       font-size: 0.875rem;
       color: #94afc8;
       line-height: 1.7;
-      flex: 1;
     }
 
     .insight-read {
@@ -477,7 +449,6 @@
       margin-top: 1.25rem;
       transition: gap 0.2s;
     }
-
 
     .insight-card:hover .insight-read { gap: 0.65rem; }
 
@@ -540,16 +511,6 @@
       .cred-item { align-items: flex-start; }
     }
   </style>
-
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-YWN1X3L3LT"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-YWN1X3L3LT');
-</script>
 </head>
 <body>
 
@@ -625,7 +586,7 @@
 
 <!-- LOGO STRIP -->
 <div class="logo-strip">
-  <div class="logo-strip-label">Companies I've worked with</div>
+  <div class="logo-strip-label">Companies &amp; Organisations</div>
   <div class="logo-track-wrap">
     <div class="logo-track" id="logoTrack">
       <div class="logo-item"><img src="images/logos/Wazobia.png" alt="Wazobia FM" /></div>
@@ -729,14 +690,8 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- CONFIG: Replace with your actual EmailJS credentials -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script>
-  emailjs.init('PUCtSvWQyPOeejJJ-'); 
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Mailjet via Vercel Function -->
 <script src="js/main.js"></script>
-<script src="js/env.js"></script>
 <script src="js/supabase-config.js"></script>
 <script>
 (async () => {
@@ -747,32 +702,14 @@
       grid.innerHTML = '<p style="color:var(--text-dim);font-size:0.9rem;padding:2rem 0;">No posts yet — check back soon.</p>';
       return;
     }
-    grid.innerHTML = posts.map(p => {
-      let images = [];
-      try {
-        images = JSON.parse(p.image_url || '[]');
-        if (typeof images === 'string') images = [images];
-      } catch (e) {
-        images = p.image_url ? [p.image_url] : [];
-      }
-      
-      const hasImg = images.length > 0;
-      return `
-        <div class="insight-card">
-          ${hasImg ? `
-            <div class="insight-card-image">
-              <img src="${images[0]}" alt="${escapeHtml(p.title)}" />
-            </div>
-          ` : ''}
-          <div class="insight-card-body">
-            <p class="insight-tag">${escapeHtml(p.category || 'Insight')}</p>
-            <h3 class="insight-title">${escapeHtml(p.title)}</h3>
-            <p class="insight-excerpt">${escapeHtml((p.excerpt || '').substring(0, 160))}${(p.excerpt || '').length > 160 ? '…' : ''}</p>
-            <a href="insights.html#post-${p.id}" class="insight-read">Read More &rarr;</a>
-          </div>
-        </div>
-      `;
-    }).join('');
+    grid.innerHTML = posts.map(p => `
+      <div class="insight-card">
+        <p class="insight-tag">${escapeHtml(p.category || 'Insight')}</p>
+        <h3 class="insight-title">${escapeHtml(p.title)}</h3>
+        <p class="insight-excerpt">${escapeHtml((p.excerpt || '').substring(0, 160))}${(p.excerpt || '').length > 160 ? '…' : ''}</p>
+        <a href="insights.html#post-${p.id}" class="insight-read">Read More &rarr;</a>
+      </div>
+    `).join('');
   } catch (e) {
     console.error('Could not load insights:', e);
   }
@@ -791,14 +728,23 @@ document.getElementById('newsletterForm').addEventListener('submit', async funct
   btn.textContent = 'Sending…';
   btn.disabled = true;
   try {
-    await emailjs.send('service_ho43xqt', 'template_tcnomqs', {
-      subscriber_email: email,
-      to_email: 'corneliusokekehr@gmail.com'
+    const res = await fetch('/api/newsletter', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
     });
-    showToast('You\'re subscribed! Welcome to the HR Revolution.', 'success');
-    this.reset();
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      showToast('You\'re subscribed! Welcome to the HR Revolution.', 'success');
+      this.reset();
+    } else {
+      showToast(data.error || 'Something went wrong. Please try again.', 'error');
+    }
   } catch (err) {
     showToast('Something went wrong. Please try again.', 'error');
+    console.error('Newsletter error:', err);
   } finally {
     btn.textContent = 'Subscribe';
     btn.disabled = false;

@@ -290,6 +290,7 @@ document.getElementById('contactForm').addEventListener('submit', async function
       showToast(data.error || 'Something went wrong. Please try again.', 'error');
     }
   } catch (err) {
+    alert('Server Response: ' + text);
     showToast('Something went wrong. Please try again or email directly.', 'error');
     console.error('Contact form error:', err);
   } finally {

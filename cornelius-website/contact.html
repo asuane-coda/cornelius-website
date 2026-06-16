@@ -274,7 +274,14 @@ document.getElementById('contactForm').addEventListener('submit', async function
       body: JSON.stringify({ from_name: name, from_email: email, subject, message })
     });
 
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (err) {
+      console.error('Non-JSON response:', text);
+      throw new Error('Server returned an invalid response.');
+    }
 
     if (res.ok && data.success) {
       showToast('Message sent! I\'ll be in touch within 48 hours.', 'success');

@@ -734,7 +734,14 @@ document.getElementById('newsletterForm').addEventListener('submit', async funct
       body: JSON.stringify({ email })
     });
 
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (err) {
+      console.error('Non-JSON response:', text);
+      throw new Error('Server returned an invalid response.');
+    }
 
     if (res.ok && data.success) {
       showToast('You\'re subscribed! Welcome to the HR Revolution.', 'success');

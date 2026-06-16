@@ -76,10 +76,9 @@ ${message}
       body: JSON.stringify(payload)
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
-      console.error('Mailjet error:', data);
+      const errorText = await response.text();
+      console.error('Mailjet error:', errorText);
       return res.status(500).json({ error: 'Failed to send email.' });
     }
 

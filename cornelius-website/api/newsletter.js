@@ -5,7 +5,7 @@
 //   MJ_APIKEY_PUBLIC   → your Mailjet API key
 //   MJ_APIKEY_PRIVATE  → your Mailjet secret key
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }

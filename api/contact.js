@@ -5,6 +5,32 @@
 //   MJ_APIKEY_PUBLIC   → your Mailjet API key
 //   MJ_APIKEY_PRIVATE  → your Mailjet secret key
 
+const { hasSupabaseAdmin, supabaseRequest } = require('./_supabase');
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+async function storeContactSubmission(submission) {
+  if (!hasSupabaseAdmin()) return;
+
+  await supabaseRequest('/rest/v1/contact_submissions', {
+    method: 'POST',
+    body: JSON.stringify({
+      name: submission.from_name,
+      email: submission.from_email,
+      subject: submission.subject,
+      message: submission.message,
+      status: 'new'
+    })
+  });
+}
+
 module.exports = async function handler(req, res) {
   console.log('API_CONTACT_CALLED', { method: req.method });
 
@@ -22,6 +48,16 @@ module.exports = async function handler(req, res) {
 
   const apiKey    = process.env.MJ_APIKEY_PUBLIC;
   const secretKey = process.env.MJ_APIKEY_PRIVATE;
+  const fromEmail = process.env.MAIL_FROM_EMAIL || 'corneliusokekehr@gmail.com';
+  const fromName  = process.env.MAIL_FROM_NAME || 'Cornelius Okeke Website';
+  const toEmail   = process.env.MAIL_TO_EMAIL || 'corneliusokekehr@gmail.com';
+  const toName    = process.env.MAIL_TO_NAME || 'Cornelius Okeke';
+
+  try {
+    await storeContactSubmission({ from_name, from_email, subject, message });
+  } catch (err) {
+    console.error('CONTACT_STORAGE_ERROR:', err.message);
+  }
 
   if (!apiKey || !secretKey) {
     console.error('MAILJET_CONFIG_ERROR: Missing keys');
@@ -34,13 +70,13 @@ module.exports = async function handler(req, res) {
     Messages: [
       {
         From: {
-          Email: 'corneliusokekehr@gmail.com', // TODO: change to a verified sender on Mailjet
-          Name:  'Cornelius Okeke Website'
+          Email: fromEmail,
+          Name:  fromName
         },
         To: [
           {
-            Email: 'corneliusokekehr@gmail.com',
-            Name:  'Cornelius Okeke'
+            Email: toEmail,
+            Name:  toName
           }
         ],
         ReplyTo: {
@@ -58,12 +94,12 @@ ${message}
         `.trim(),
         HTMLPart: `
 <h3>New Contact Form Submission</h3>
-<p><strong>Name:</strong> ${from_name}</p>
-<p><strong>Email:</strong> <a href="mailto:${from_email}">${from_email}</a></p>
-<p><strong>Subject:</strong> ${subject}</p>
+<p><strong>Name:</strong> ${escapeHtml(from_name)}</p>
+<p><strong>Email:</strong> <a href="mailto:${escapeHtml(from_email)}">${escapeHtml(from_email)}</a></p>
+<p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
 <hr />
 <p><strong>Message:</strong></p>
-<p>${message.replace(/\n/g, '<br>')}</p>
+<p>${escapeHtml(message).replace(/\n/g, '<br>')}</p>
         `.trim()
       }
     ]

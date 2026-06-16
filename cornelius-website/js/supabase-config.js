@@ -60,6 +60,46 @@ window.getAllPosts = async function() {
   return data;
 };
 
+window.getSubscribers = async function() {
+  const { data, error } = await sbClient
+    .from('newsletter_subscribers')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data;
+};
+
+window.getContactSubmissions = async function() {
+  const { data, error } = await sbClient
+    .from('contact_submissions')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data;
+};
+
+window.sendSubscriberCampaign = async function(subject, message) {
+  const session = await window.getAdminSession();
+  if (!session || !session.access_token) {
+    throw new Error('You must be signed in to send emails.');
+  }
+
+  const res = await fetch('/api/campaign', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${session.access_token}`
+    },
+    body: JSON.stringify({ subject, message })
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Failed to send email.');
+  return data;
+};
+
 window.getPostById = async function(id) {
   const { data, error } = await sbClient
     .from('blog_posts')

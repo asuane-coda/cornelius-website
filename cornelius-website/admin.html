@@ -418,12 +418,46 @@
   <div class="admin-tabs">
     <button class="admin-tab active" data-tab="posts">All Posts</button>
     <button class="admin-tab" data-tab="new">New Post</button>
+    <button class="admin-tab" data-tab="subscribers">Subscribers</button>
+    <button class="admin-tab" data-tab="messages">Messages</button>
+    <button class="admin-tab" data-tab="email">Email Subscribers</button>
   </div>
 
   <!-- POSTS TAB -->
   <div id="tabPosts">
     <div id="postListWrap">
       <p style="color:var(--text-dim); font-size:0.9rem;">Loading posts&hellip;</p>
+    </div>
+  </div>
+
+  <!-- SUBSCRIBERS TAB -->
+  <div id="tabSubscribers" style="display:none;">
+    <div id="subscriberListWrap">
+      <p style="color:var(--text-dim); font-size:0.9rem;">Loading subscribers&hellip;</p>
+    </div>
+  </div>
+
+  <!-- CONTACT MESSAGES TAB -->
+  <div id="tabMessages" style="display:none;">
+    <div id="messageListWrap">
+      <p style="color:var(--text-dim); font-size:0.9rem;">Loading messages&hellip;</p>
+    </div>
+  </div>
+
+  <!-- BULK EMAIL TAB -->
+  <div id="tabEmail" style="display:none;">
+    <div class="editor-wrap">
+      <h2 style="font-size:1.5rem; margin-bottom:0.5rem;">Email Subscribers</h2>
+      <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:2rem;">Send a plain email to every active newsletter subscriber.</p>
+      <div class="form-group">
+        <label for="campaignSubject">Subject</label>
+        <input type="text" id="campaignSubject" placeholder="Email subject" />
+      </div>
+      <div class="form-group">
+        <label for="campaignMessage">Message</label>
+        <textarea id="campaignMessage" placeholder="Write the email message..." style="min-height:220px;"></textarea>
+      </div>
+      <button class="btn btn-primary" id="sendCampaignBtn">Send to Subscribers</button>
     </div>
   </div>
 
@@ -597,9 +631,14 @@ document.querySelectorAll('.admin-tab').forEach(tab => {
     document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
     const t = tab.dataset.tab;
-    document.getElementById('tabPosts').style.display = t === 'posts' ? 'block' : 'none';
-    document.getElementById('tabNew').style.display   = t === 'new'   ? 'block' : 'none';
+    document.getElementById('tabPosts').style.display       = t === 'posts'       ? 'block' : 'none';
+    document.getElementById('tabNew').style.display         = t === 'new'         ? 'block' : 'none';
+    document.getElementById('tabSubscribers').style.display = t === 'subscribers' ? 'block' : 'none';
+    document.getElementById('tabMessages').style.display    = t === 'messages'    ? 'block' : 'none';
+    document.getElementById('tabEmail').style.display       = t === 'email'       ? 'block' : 'none';
     if (t === 'posts') loadPosts();
+    if (t === 'subscribers') loadSubscribers();
+    if (t === 'messages') loadContactMessages();
   });
 });
 
@@ -607,8 +646,11 @@ function switchToTab(name) {
   document.querySelectorAll('.admin-tab').forEach(t => {
     t.classList.toggle('active', t.dataset.tab === name);
   });
-  document.getElementById('tabPosts').style.display = name === 'posts' ? 'block' : 'none';
-  document.getElementById('tabNew').style.display   = name === 'new'   ? 'block' : 'none';
+  document.getElementById('tabPosts').style.display       = name === 'posts'       ? 'block' : 'none';
+  document.getElementById('tabNew').style.display         = name === 'new'         ? 'block' : 'none';
+  document.getElementById('tabSubscribers').style.display = name === 'subscribers' ? 'block' : 'none';
+  document.getElementById('tabMessages').style.display    = name === 'messages'    ? 'block' : 'none';
+  document.getElementById('tabEmail').style.display       = name === 'email'       ? 'block' : 'none';
 }
 
 // ── LOAD ALL POSTS ─────────────────────────────────────────────────────
@@ -722,6 +764,114 @@ async function loadPosts() {
 }
 
 // ── IMAGE UPLOAD ──────────────────────────────────────────────────────
+async function loadSubscribers() {
+  const wrap = document.getElementById('subscriberListWrap');
+  wrap.innerHTML = '<p style="color:var(--text-dim);font-size:0.9rem;">Loading subscribers...</p>';
+
+  try {
+    const subscribers = await window.getSubscribers();
+    const active = subscribers.filter(s => s.status !== 'unsubscribed');
+
+    if (!subscribers.length) {
+      wrap.innerHTML = `
+        <div class="empty-state">
+          <strong>No subscribers yet</strong>
+          <p>Newsletter signups will appear here.</p>
+        </div>`;
+      return;
+    }
+
+    wrap.innerHTML = `
+      <div class="stats-bar">
+        <div class="stat-item"><span class="stat-num">${subscribers.length}</span><span class="stat-label">Total subscribers</span></div>
+        <div class="stat-item"><span class="stat-num">${active.length}</span><span class="stat-label">Active</span></div>
+      </div>
+      ${subscribers.map(s => `
+        <div class="post-list-item">
+          <div class="post-list-info">
+            <div class="post-list-title">${escapeHtml(s.email)}</div>
+            <div class="post-list-meta">
+              <span>${escapeHtml(s.status || 'subscribed')}</span>
+              &nbsp;&middot;&nbsp;
+              <span>${formatDate(s.created_at)}</span>
+              ${s.source ? `&nbsp;&middot;&nbsp;<span>${escapeHtml(s.source)}</span>` : ''}
+            </div>
+          </div>
+          <div class="post-list-actions">
+            <a class="act-btn" href="mailto:${escapeHtml(s.email)}">Email</a>
+          </div>
+        </div>
+      `).join('')}
+    `;
+  } catch (e) {
+    wrap.innerHTML = '<p style="color:#c85a5a;font-size:0.9rem;">Could not load subscribers. Make sure the newsletter_subscribers table and RLS policies exist.</p>';
+  }
+}
+
+async function loadContactMessages() {
+  const wrap = document.getElementById('messageListWrap');
+  wrap.innerHTML = '<p style="color:var(--text-dim);font-size:0.9rem;">Loading messages...</p>';
+
+  try {
+    const messages = await window.getContactSubmissions();
+
+    if (!messages.length) {
+      wrap.innerHTML = `
+        <div class="empty-state">
+          <strong>No contact messages yet</strong>
+          <p>Contact form submissions will appear here.</p>
+        </div>`;
+      return;
+    }
+
+    wrap.innerHTML = messages.map(m => `
+      <div class="post-list-item" style="display:block;">
+        <div class="post-list-info">
+          <div class="post-list-title">${escapeHtml(m.subject || 'Contact message')}</div>
+          <div class="post-list-meta">
+            <span>${escapeHtml(m.name || '')}</span>
+            &nbsp;&middot;&nbsp;
+            <a href="mailto:${escapeHtml(m.email || '')}" style="color:var(--gold);">${escapeHtml(m.email || '')}</a>
+            &nbsp;&middot;&nbsp;
+            <span>${formatDate(m.created_at)}</span>
+          </div>
+          <p style="font-size:0.9rem;color:var(--text-muted);line-height:1.7;margin-top:0.8rem;white-space:pre-wrap;">${escapeHtml(m.message || '')}</p>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    wrap.innerHTML = '<p style="color:#c85a5a;font-size:0.9rem;">Could not load contact messages. Make sure the contact_submissions table and RLS policies exist.</p>';
+  }
+}
+
+document.getElementById('sendCampaignBtn').addEventListener('click', async () => {
+  const subject = document.getElementById('campaignSubject').value.trim();
+  const message = document.getElementById('campaignMessage').value.trim();
+
+  if (!subject || !message) {
+    showToast('Please add a subject and message.', 'error');
+    return;
+  }
+
+  if (!confirm('Send this email to every active subscriber?')) return;
+
+  const btn = document.getElementById('sendCampaignBtn');
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+
+  try {
+    const result = await window.sendSubscriberCampaign(subject, message);
+    showToast(`Email sent to ${result.sent} subscriber(s).`, 'success');
+    document.getElementById('campaignSubject').value = '';
+    document.getElementById('campaignMessage').value = '';
+  } catch (err) {
+    showToast(err.message || 'Could not send email.', 'error');
+  } finally {
+    btn.textContent = 'Send to Subscribers';
+    btn.disabled = false;
+  }
+});
+
 document.getElementById('imageUpload').addEventListener('change', async (e) => {
   const files = Array.from(e.target.files);
   if (!files.length) return;

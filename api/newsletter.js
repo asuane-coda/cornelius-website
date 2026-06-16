@@ -5,6 +5,31 @@
 //   MJ_APIKEY_PUBLIC   → your Mailjet API key
 //   MJ_APIKEY_PRIVATE  → your Mailjet secret key
 
+const { hasSupabaseAdmin, supabaseRequest } = require('./_supabase');
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+async function storeSubscriber(email) {
+  if (!hasSupabaseAdmin()) return;
+
+  await supabaseRequest('/rest/v1/newsletter_subscribers?on_conflict=email', {
+    method: 'POST',
+    headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+    body: JSON.stringify({
+      email,
+      status: 'subscribed',
+      source: 'website'
+    })
+  });
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -18,6 +43,16 @@ module.exports = async function handler(req, res) {
 
   const apiKey    = process.env.MJ_APIKEY_PUBLIC;
   const secretKey = process.env.MJ_APIKEY_PRIVATE;
+  const fromEmail = process.env.MAIL_FROM_EMAIL || 'corneliusokekehr@gmail.com';
+  const fromName  = process.env.MAIL_FROM_NAME || 'Cornelius Okeke Website';
+  const toEmail   = process.env.MAIL_TO_EMAIL || 'corneliusokekehr@gmail.com';
+  const toName    = process.env.MAIL_TO_NAME || 'Cornelius Okeke';
+
+  try {
+    await storeSubscriber(email);
+  } catch (err) {
+    console.error('NEWSLETTER_STORAGE_ERROR:', err.message);
+  }
 
   if (!apiKey || !secretKey) {
     return res.status(500).json({ error: 'Email service not configured.' });
@@ -30,20 +65,20 @@ module.exports = async function handler(req, res) {
     Messages: [
       {
         From: {
-          Email: 'corneliusokekehr@gmail.com', // TODO: change to verified Mailjet sender
-          Name:  'Cornelius Okeke Website'
+          Email: fromEmail,
+          Name:  fromName
         },
         To: [
           {
-            Email: 'corneliusokekehr@gmail.com',
-            Name:  'Cornelius Okeke'
+            Email: toEmail,
+            Name:  toName
           }
         ],
         Subject: `New newsletter subscriber: ${email}`,
         TextPart: `You have a new newsletter subscriber.\n\nEmail: ${email}\n\nThey signed up from corneliusokeke.com`,
         HTMLPart: `
 <h3>New Newsletter Subscriber</h3>
-<p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+<p><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
 <p>They signed up from <a href="https://corneliusokeke.com">corneliusokeke.com</a></p>
         `.trim()
       }
@@ -55,7 +90,7 @@ module.exports = async function handler(req, res) {
     Messages: [
       {
         From: {
-          Email: 'corneliusokekehr@gmail.com', // TODO: change to verified Mailjet sender
+          Email: fromEmail,
           Name:  'Cornelius Okeke'
         },
         To: [

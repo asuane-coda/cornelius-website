@@ -17,7 +17,10 @@ function escapeHtml(value) {
 }
 
 async function storeSubscriber(email) {
-  if (!hasSupabaseAdmin()) return;
+  if (!hasSupabaseAdmin()) {
+    console.error('NEWSLETTER_STORAGE_SKIPPED: Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+    return false;
+  }
 
   await supabaseRequest('/rest/v1/newsletter_subscribers?on_conflict=email', {
     method: 'POST',
@@ -28,6 +31,8 @@ async function storeSubscriber(email) {
       source: 'website'
     })
   });
+
+  return true;
 }
 
 module.exports = async function handler(req, res) {
@@ -48,8 +53,9 @@ module.exports = async function handler(req, res) {
   const toEmail   = process.env.MAIL_TO_EMAIL || 'corneliusokekehr@gmail.com';
   const toName    = process.env.MAIL_TO_NAME || 'Cornelius Okeke';
 
+  let stored = false;
   try {
-    await storeSubscriber(email);
+    stored = await storeSubscriber(email);
   } catch (err) {
     console.error('NEWSLETTER_STORAGE_ERROR:', err.message);
   }
@@ -141,7 +147,7 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ error: 'Failed to process subscription.' });
     }
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, stored });
 
   } catch (err) {
     console.error('Server error:', err);

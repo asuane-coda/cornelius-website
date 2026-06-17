@@ -17,7 +17,10 @@ function escapeHtml(value) {
 }
 
 async function storeContactSubmission(submission) {
-  if (!hasSupabaseAdmin()) return;
+  if (!hasSupabaseAdmin()) {
+    console.error('CONTACT_STORAGE_SKIPPED: Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+    return false;
+  }
 
   await supabaseRequest('/rest/v1/contact_submissions', {
     method: 'POST',
@@ -29,6 +32,8 @@ async function storeContactSubmission(submission) {
       status: 'new'
     })
   });
+
+  return true;
 }
 
 module.exports = async function handler(req, res) {
@@ -53,8 +58,9 @@ module.exports = async function handler(req, res) {
   const toEmail   = process.env.MAIL_TO_EMAIL || 'corneliusokekehr@gmail.com';
   const toName    = process.env.MAIL_TO_NAME || 'Cornelius Okeke';
 
+  let stored = false;
   try {
-    await storeContactSubmission({ from_name, from_email, subject, message });
+    stored = await storeContactSubmission({ from_name, from_email, subject, message });
   } catch (err) {
     console.error('CONTACT_STORAGE_ERROR:', err.message);
   }
@@ -125,7 +131,7 @@ ${message}
     }
 
     console.log('MAILJET_SUCCESS', responseText);
-    return res.status(200).json({ success: true, raw: responseText });
+    return res.status(200).json({ success: true, stored, raw: responseText });
 
   } catch (err) {
     console.error('SERVER_EXCEPTION:', err);

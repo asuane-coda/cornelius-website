@@ -804,6 +804,7 @@ async function loadSubscribers() {
       `).join('')}
     `;
   } catch (e) {
+    console.error('Could not load subscribers:', e);
     wrap.innerHTML = '<p style="color:#c85a5a;font-size:0.9rem;">Could not load subscribers. Make sure the newsletter_subscribers table and RLS policies exist.</p>';
   }
 }
@@ -840,6 +841,7 @@ async function loadContactMessages() {
       </div>
     `).join('');
   } catch (e) {
+    console.error('Could not load contact messages:', e);
     wrap.innerHTML = '<p style="color:#c85a5a;font-size:0.9rem;">Could not load contact messages. Make sure the contact_submissions table and RLS policies exist.</p>';
   }
 }

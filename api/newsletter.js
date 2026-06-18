@@ -48,7 +48,7 @@ module.exports = async function handler(req, res) {
 
   const apiKey    = process.env.MJ_APIKEY_PUBLIC;
   const secretKey = process.env.MJ_APIKEY_PRIVATE;
-  const fromEmail = process.env.MAIL_FROM_EMAIL || 'corneliusokekehr@gmail.com';
+  const fromEmail = process.env.MAIL_FROM_EMAIL || 'noreply@corneliusokeke.com';
   const fromName  = process.env.MAIL_FROM_NAME || 'Cornelius Okeke Website';
   const toEmail   = process.env.MAIL_TO_EMAIL || 'corneliusokekehr@gmail.com';
   const toName    = process.env.MAIL_TO_NAME || 'Cornelius Okeke';

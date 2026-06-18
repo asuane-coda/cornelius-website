@@ -18,8 +18,7 @@ function escapeHtml(value) {
 
 async function storeSubscriber(email) {
   if (!hasSupabaseAdmin()) {
-    console.error('NEWSLETTER_STORAGE_SKIPPED: Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
-    return false;
+    throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
   }
 
   await supabaseRequest('/rest/v1/newsletter_subscribers?on_conflict=email', {
@@ -48,7 +47,7 @@ module.exports = async function handler(req, res) {
 
   const apiKey    = process.env.MJ_APIKEY_PUBLIC;
   const secretKey = process.env.MJ_APIKEY_PRIVATE;
-  const fromEmail = process.env.MAIL_FROM_EMAIL || 'noreply@corneliusokeke.com';
+  const fromEmail = process.env.MAIL_FROM_EMAIL || 'hello@corneliusokeke.com';
   const fromName  = process.env.MAIL_FROM_NAME || 'Cornelius Okeke Website';
   const toEmail   = process.env.MAIL_TO_EMAIL || 'corneliusokekehr@gmail.com';
   const toName    = process.env.MAIL_TO_NAME || 'Cornelius Okeke';
@@ -58,6 +57,10 @@ module.exports = async function handler(req, res) {
     stored = await storeSubscriber(email);
   } catch (err) {
     console.error('NEWSLETTER_STORAGE_ERROR:', err.message);
+    return res.status(500).json({
+      error: 'Subscription could not be saved.',
+      message: err.message
+    });
   }
 
   if (!apiKey || !secretKey) {
